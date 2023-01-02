@@ -5,7 +5,7 @@ namespace DAL.DataEntities
     public class Event
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; }
         public string? Description { get; set; }
         public Day Day { get; set; }
         public DateTime StartTime { get; set; }
