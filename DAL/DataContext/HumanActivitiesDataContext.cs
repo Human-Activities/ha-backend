@@ -4,13 +4,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL.DataContext
 {
-    public class HumanActivitiesDataContext : DbContext
+    public class HumanActivitiesDataContext : DbContext, IHumanActivitiesDataContext
     {
         public HumanActivitiesDataContext()
-        {}
+        { }
 
         public HumanActivitiesDataContext(DbContextOptions Options) : base(Options)
-        {}
+        { }
 
         public virtual DbSet<Activity> Activities { get; set; }
         public virtual DbSet<Calendar> Calendars { get; set; }
@@ -19,7 +19,7 @@ namespace DAL.DataContext
         public virtual DbSet<Event> Events { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<DataEntities.Task> Tasks { get; set; }
-        public virtual DbSet<ToDoListTemplate> ToDoListTemplates{ get; set; }
+        public virtual DbSet<ToDoListTemplate> ToDoListTemplates { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserIdentity> UserIdentities { get; set; }
         public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
