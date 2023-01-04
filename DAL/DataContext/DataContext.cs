@@ -1,14 +1,15 @@
 ﻿using DAL.DataEntities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace DAL.DataContext
 {
-    public class DataContext : DbContext
+    public class HumanActivitiesDataContext : DbContext
     {
-        public DataContext()
+        public HumanActivitiesDataContext()
         {}
 
-        public DataContext(DbContextOptions Options) : base(Options)
+        public HumanActivitiesDataContext(DbContextOptions Options) : base(Options)
         {}
 
         public virtual DbSet<Activity> Activities { get; set; }
@@ -24,7 +25,48 @@ namespace DAL.DataContext
         public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                string connectionString = builder.Build().GetSection("ConnectionStrings").GetSection("HumanActivitiesDB").Value;
+                optionsBuilder.UseLazyLoadingProxies().UseNpgsql(connectionString);
+            }
+        }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User");
 
+                entity.HasOne(e => e.UserRole)
+                    .WithMany(u => u.Users)
+                    .HasForeignKey(e => e.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_User_UserRoleId");
+            });
+
+            modelBuilder.Entity<UserIdentity>(entity =>
+            {
+                entity.ToTable("UserIdentity");
+
+                entity.HasKey(e => e.UserId);
+
+                entity.Property(e => e.Salt)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<UserRefreshToken>(entity =>
+            {
+                entity.ToTable("UserRefreshToken");
+
+                entity.HasKey(e => e.UserId);
+
+                entity.Property(e => e.Token)
+                    .IsRequired();
+            });
+        }
     }
 }
