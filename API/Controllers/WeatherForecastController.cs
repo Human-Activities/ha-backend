@@ -15,12 +15,10 @@ namespace API.Controllers
     };
 
         private readonly IUnitOfWork _uow;
-        private readonly HumanActivitiesDataContext _humanActivitiesDataContext;
 
-        public WeatherForecastController(HumanActivitiesDataContext humanActivitiesDataContext)
+        public WeatherForecastController()
         {
             _uow = DataAccessLayerFactory.CreateUnitOfWork();
-            _humanActivitiesDataContext = humanActivitiesDataContext;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
