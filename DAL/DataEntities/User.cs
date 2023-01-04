@@ -8,8 +8,8 @@
         }
 
         public Guid Id { get; set; }
-        public string Login { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string Login { get; set; }
+        public string PasswordHash { get; set; }
         public int RoleId { get; set; }
 
         public virtual UserRole UserRole { get; set; }

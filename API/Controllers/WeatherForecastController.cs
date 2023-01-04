@@ -1,3 +1,6 @@
+using DAL;
+using DAL.DataContext;
+using DAL.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -11,23 +14,33 @@ namespace API.Controllers
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IUnitOfWork _uow;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController()
         {
-            _logger = logger;
+            _uow = DataAccessLayerFactory.CreateUnitOfWork();
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<ActionResult<string>> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            await _uow.CategoryRepo.AddAsync(new DAL.DataEntities.Category()
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                Name = "Category",
+            });
+
+            await _uow.ActivityRepo.AddAsync(new DAL.DataEntities.Activity()
+            {
+                Name = "Activity",
+                Description = "Desc",
+                IsTemplate = true,
+            });
+
+            await _uow.CompleteAsync();
+
+            var categories = await _uow.CategoryRepo.GetAllAsync();
+
+            return categories?.FirstOrDefault()?.Name ?? string.Empty;
         }
     }
 }
