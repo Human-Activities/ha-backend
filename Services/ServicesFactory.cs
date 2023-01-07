@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Configuration;
+using Services.PasswordHasher;
 using Services.TokenGenerators;
 using Services.TokenValidators;
 
@@ -12,10 +13,16 @@ namespace Services
         {
             ContainerBuilder builder = new ContainerBuilder();
             builder.RegisterType<AccessTokenGenerator>().SingleInstance();
+            builder.RegisterType<AccessTokenValidator>().SingleInstance();
+            builder.RegisterType<BCryptPasswordHasher>().As<IPasswordHasher>();
             builder.RegisterType<RefreshTokenGenerator>().SingleInstance();
             builder.RegisterType<RefreshTokenValidator>().SingleInstance();
-            builder.RegisterType<AccessTokenValidator>().SingleInstance();
             Container = builder.Build();
+        }
+
+        public static IPasswordHasher CreateBCryptPasswordHasher()
+        {
+            return Container.Resolve<IPasswordHasher>();
         }
 
         public static AccessTokenGenerator CreateAccessTokenGenerator(IConfiguration configuration)
