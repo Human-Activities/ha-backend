@@ -8,6 +8,9 @@
         }
 
         public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string LastName { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public string Login { get; set; }
         public string PasswordHash { get; set; }
         public int RoleId { get; set; }
