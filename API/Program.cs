@@ -1,5 +1,9 @@
+using API.Authenticators;
 using DAL.DataContext;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +15,31 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<HumanActivitiesDataContext>(
-    o => o.UseNpgsql(builder.Configuration.GetConnectionString("HumanActivitiesDB"))); 
+    o => o.UseNpgsql(builder.Configuration.GetConnectionString("HumanActivitiesDB")));
+
+builder.Services.AddSingleton<Authenticator>();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(jwtBearerOptions =>
+    {
+        jwtBearerOptions.RequireHttpsMetadata = true;
+        jwtBearerOptions.SaveToken = true;
+        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["JWTSettings:Issuer"],
+            ValidAudience = builder.Configuration["JWTSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWTSettings:AccessSecretKey"])),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 var app = builder.Build();
 
@@ -24,6 +52,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

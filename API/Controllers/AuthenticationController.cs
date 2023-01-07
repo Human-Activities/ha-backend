@@ -15,6 +15,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
+    [Route("[controller]")]
     [ApiController]
     public class AuthenticationController : Controller
     {
@@ -35,7 +36,7 @@ namespace API.Controllers
             _accessTokenValidator = ServicesFactory.CreateAccessTokenValidator(_configuration);
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<ActionResult<RequestResult>> Register([FromBody] RegisterModel registerModel)
         {
             User? user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == registerModel.Login);
@@ -90,7 +91,7 @@ namespace API.Controllers
             return Ok(new RequestResult { Successful = true, Message = "Poprawnie utworzono użytkownika." });
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<ActionResult<User>> Login([FromBody] LoginModel loginModel)
         {
             if (loginModel == null)
