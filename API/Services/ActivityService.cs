@@ -34,9 +34,9 @@ public class ActivityService
         return new CreateActivityResult("Activity has been created succesfully!");
     }
 
-    public async Task<GetActivityResult> GetActivity (GetActivityRequest request)
+    public async Task<GetActivityResult> GetActivity (int activityId)
     {
-        var activity = await _uow.ActivityRepo.FindAsync(request.Id);
+        var activity = await _uow.ActivityRepo.FindAsync(activityId);
 
         return new GetActivityResult
         {
@@ -76,9 +76,9 @@ public class ActivityService
         return new EditActivityResult("Activity has been edited successfully!");
     }
 
-    public async Task<DeleteActivityResult> DeleteActivity (DeleteActivityRequest request)
+    public async Task<DeleteActivityResult> DeleteActivity (int activityId)
     {
-        var activity = await _uow.ActivityRepo.FindAsync(request.Id);
+        var activity = await _uow.ActivityRepo.FindAsync(activityId);
 
         if (activity == null)
             throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");

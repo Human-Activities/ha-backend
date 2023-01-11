@@ -28,16 +28,16 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get")]
+        [HttpGet("get/{activityId:int}")]
         [ProducesResponseType(typeof(GetActivityResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetActvities(GetActivityRequest request)
+        public async Task<IActionResult> GetActvities(int activityId)
         {
-            var result = await _activityService.GetActivity(request);
+            var result = await _activityService.GetActivity(activityId);
 
             return Ok(result);
         }
 
-        [HttpGet("getall")]
+        [HttpGet("get")]
         [ProducesResponseType(typeof(GetActivitiesResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvities(GetActivitiesRequest request)
         {
@@ -56,11 +56,11 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{activityId:int}")]
         [ProducesResponseType(typeof(DeleteActivityResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeleteActivity(DeleteActivityRequest request)
+        public async Task<IActionResult> DeleteActivity(int activityId)
         {
-            var result = await _activityService.DeleteActivity(request);
+            var result = await _activityService.DeleteActivity(activityId);
 
             return Ok(result);
         }
