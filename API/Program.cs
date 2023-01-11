@@ -1,4 +1,6 @@
 using API.Authenticators;
+using API.Extensions;
+using API.Filters;
 using DAL.DataContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +42,11 @@ builder.Services.AddAuthentication(options =>
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddDomainServices();
+
+builder.Services
+    .AddControllers(options => options.Filters.Add<ExceptionFilter>());
 
 var app = builder.Build();
 

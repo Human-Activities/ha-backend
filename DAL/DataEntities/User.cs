@@ -5,6 +5,7 @@
         public User()
         {
             Calendars = new HashSet<Calendar>();
+            Activities= new HashSet<Activity>();
         }
 
         public Guid Id { get; set; }
@@ -17,5 +18,6 @@
 
         public virtual UserRole UserRole { get; set; }
         public virtual ICollection<Calendar> Calendars { get; set; }
+        public virtual ICollection<Activity> Activities{ get; set; }
     }
 }
