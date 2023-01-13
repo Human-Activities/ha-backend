@@ -2,6 +2,10 @@
 using API.Models.Activities;
 using DAL.UnitOfWork;
 using DAL;
+using API.Models.Groups;
+using DAL.DataEntities;
+using Microsoft.IdentityModel.Tokens;
+using API.ViewModels;
 
 namespace API.Services
 {
@@ -14,93 +18,133 @@ namespace API.Services
             _uow = DataAccessLayerFactory.CreateUnitOfWork();
         }
 
-        public async Task<CreateActivityResult> CreateGroup(CreateActivityRequest request)
+        public async Task<CreateGroupResult> CreateGroup(CreateGroupRequest request)
         {
             if (request.Name.IsNullOrEmpty())
-                throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
+                throw new OperationException(StatusCodes.Status400BadRequest, "Group name can't be empty");
 
-            var activity = new Group
+            var users = new List<User>();
+
+            if (request.UserGuids.Any())
+            {
+                foreach (var userGuid in request.UserGuids)
+                {
+                    var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Id == userGuid);
+
+                    if (user != null)
+                    {
+                        users.Add(user);
+                    }
+                }
+            }
+
+            if (!users.Any())
+                throw new OperationException(StatusCodes.Status400BadRequest, "Can't create group without any user.");
+
+            var group = new Group
             {
                 Name = request.Name,
                 Description = request.Description,
-                IsPrivate = request.IsPrivate
+                Users = users
             };
 
-            await _uow.ActivityRepo.AddAsync(activity);
+            await _uow.GroupRepo.AddAsync(group);
             await _uow.CompleteAsync();
 
-            return new CreateActivityResult("Activity has been created succesfully!");
+            return new CreateGroupResult("Group has been created succesfully!");
         }
 
-        public async Task<GetActivityResult> GetGroup(int groupId)
+        public async Task<GetGroupResult> GetGroup(int groupId)
         {
-            var activity = await _uow.ActivityRepo.FindAsync(groupId);
+            var group = await _uow.GroupRepo.FindAsync(groupId);
 
-            return new GetActivityResult
+            return new GetGroupResult
             {
-                Name = activity.Name,
-                Description = activity.Description,
-                IsPrivate = activity.IsPrivate,
-                IsTemplate = activity.IsTemplate,
-                Categories = activity.Categories
+                Name = group.Name,
+                Description = group.Description,
+                Users = group.Users.Select(
+                    u => new UserViewModel
+                    {
+                        Name = u.Name,
+                        LastName = u.LastName
+                    })
             };
         }
 
-        public async Task<IEnumerable<GetActivitiesResult>> GetGroups(GetActivitiesRequest request, string userId)
+        public async Task<IEnumerable<GetGroupResult>> GetGroups(string userId)
         {
-            var activities = await _uow.ActivityRepo.WhereAsync(a => a.IsPrivate == request.IsPrivate && a.User.Id == Guid.Parse(userId));
+            var groups = await _uow.GroupRepo.WhereAsync(g => g.Users.Any( u => u.Id == Guid.Parse(userId)));
 
-            return activities.Select(a => a.ToGetActivitiesResult());
+            return groups.Select(g => g.ToGetActivitiesResult());
         }
 
-        public async Task<EditActivityResult> EditGroup(EditActivityRequest request)
+        public async Task<EditGroupResult> EditGroup(EditGroupRequest request)
         {
             if (request.Name.IsNullOrEmpty())
-                throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
+                throw new OperationException(StatusCodes.Status400BadRequest, "Group name can't be empty");
 
-            var activity = await _uow.ActivityRepo.FindAsync(request.Id);
+            var group = await _uow.GroupRepo.FindAsync(request.Id);
 
-            if (activity == null)
+            if (group == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
 
-            activity.Name = request.Name;
-            activity.Description = request.Description;
-            activity.IsPrivate = request.IsPrivate;
-            activity.IsTemplate = request.IsTemplate;
+            var users = new List<User>();
 
-            _uow.ActivityRepo.Update(activity);
+            if (request.UserGuids.Any())
+            {
+                foreach (var userGuid in request.UserGuids)
+                {
+                    var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Id == userGuid);
+
+                    if (user != null)
+                    {
+                        users.Add(user);
+                    }
+                }
+            }
+
+            if (!users.Any())
+                throw new OperationException(StatusCodes.Status400BadRequest, "Can't create group without any user.");
+
+            group.Name = request.Name;
+            group.Description = request.Description;
+            group.Users = users;
+
+            _uow.GroupRepo.Update(group);
             await _uow.CompleteAsync();
 
-            return new EditActivityResult("Activity has been edited successfully!");
+            return new EditGroupResult("Group has been edited successfully!");
         }
 
-        public async Task<DeleteActivityResult> DeleteGroup(int groupId)
+        public async Task<DeleteGroupResult> DeleteGroup(int groupId)
         {
-            var activity = await _uow.ActivityRepo.FindAsync(groupId);
+            var group = await _uow.GroupRepo.FindAsync(groupId);
 
-            if (activity == null)
-                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
+            if (group == null)
+                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no group like this");
 
-            _uow.ActivityRepo.Remove(activity);
+            _uow.GroupRepo.Remove(group);
             await _uow.CompleteAsync();
 
-            return new DeleteActivityResult("Activity has been deleted successfully!");
+            return new DeleteGroupResult("Group has been deleted successfully!");
         }
     }
 }
 
-public static class ActivityServiceExtensions
+public static class GroupsServiceExtensions
 {
-    public static GetActivitiesResult ToGetActivitiesResult(this Activity activity)
+    public static GetGroupResult ToGetActivitiesResult(this Group group)
     {
-        return new GetActivitiesResult
+        return new GetGroupResult
         {
-            Id = activity.Id,
-            Name = activity.Name,
-            Description = activity.Description,
-            IsPrivate = activity.IsPrivate,
-            IsTemplate = activity.IsTemplate,
-            Categories = activity.Categories
+            Name = group.Name,
+            Description = group.Description,
+            Users = group.Users.Select(
+                    u => new UserViewModel
+                    {
+                        Name = u.Name,
+                        LastName = u.LastName
+                    })
         };
     }
 }

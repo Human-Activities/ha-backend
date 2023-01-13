@@ -1,4 +1,5 @@
 ﻿using API.Models.Activities;
+using API.Models.Groups;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -17,8 +18,8 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
-        [ProducesResponseType(typeof(CreateActivityResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CreateGroup(CreateActivityRequest request)
+        [ProducesResponseType(typeof(CreateGroupResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
             var result = await _groupService.CreateGroup(request);
 
@@ -26,7 +27,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get/{groupId:int}")]
-        [ProducesResponseType(typeof(GetActivityResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGroup(int groupId)
         {
             var result = await _groupService.GetGroup(groupId);
@@ -35,18 +36,18 @@ namespace API.Controllers
         }
 
         [HttpGet("get")]
-        [ProducesResponseType(typeof(GetActivitiesResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetGroups(GetActivitiesRequest request)
+        [ProducesResponseType(typeof(IEnumerable<GetGroupResult>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetGroups()
         {
             string userId = HttpContext.User.FindFirstValue("id");
-            var result = await _groupService.GetGroups(request, userId);
+            var result = await _groupService.GetGroups(userId);
 
             return Ok(result);
         }
 
         [HttpPut("edit")]
-        [ProducesResponseType(typeof(EditActivityResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> EditGroup(EditActivityRequest request)
+        [ProducesResponseType(typeof(EditGroupResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> EditGroup(EditGroupRequest request)
         {
             var result = await _groupService.EditGroup(request);
 
@@ -54,7 +55,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{groupId:int}")]
-        [ProducesResponseType(typeof(DeleteActivityResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DeleteGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteGroup(int groupId)
         {
             var result = await _groupService.DeleteGroup(groupId);
