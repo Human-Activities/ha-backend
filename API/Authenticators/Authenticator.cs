@@ -43,6 +43,7 @@ namespace API.Authenticators
 
             return new RequestResult
             {
+                UserId = user.Id,
                 Successful = true,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken

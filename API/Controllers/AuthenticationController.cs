@@ -15,7 +15,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : Controller
     {
@@ -37,7 +37,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<RequestResult>> Register([FromBody] RegisterModel registerModel)
+        public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
         {
             User? user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == registerModel.Login);
             if (user != null)
@@ -92,7 +92,7 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             if (loginModel == null)
             {

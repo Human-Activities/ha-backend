@@ -3,6 +3,7 @@ using System;
 using DAL.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(HumanActivitiesDataContext))]
-    partial class HumanActivitiesDataContextModelSnapshot : ModelSnapshot
+    [Migration("20230111212112_ActivityAndGroup_update")]
+    partial class ActivityAndGroupupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,12 +46,7 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Activities");
                 });
@@ -319,17 +317,6 @@ namespace DAL.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.Activity", b =>
-                {
-                    b.HasOne("DAL.DataEntities.User", "User")
-                        .WithMany("Activities")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("DAL.DataEntities.Calendar", b =>
                 {
                     b.HasOne("DAL.DataEntities.User", "User")
@@ -438,8 +425,6 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.DataEntities.User", b =>
                 {
-                    b.Navigation("Activities");
-
                     b.Navigation("Calendars");
                 });
 
