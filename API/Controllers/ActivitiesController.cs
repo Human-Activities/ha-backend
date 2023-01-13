@@ -38,7 +38,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get")]
-        [ProducesResponseType(typeof(GetActivitiesResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<GetActivitiesResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvities(GetActivitiesRequest request)
         {
             string userId = HttpContext.User.FindFirstValue("id");
