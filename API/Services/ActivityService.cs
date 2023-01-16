@@ -50,7 +50,7 @@ public class ActivityService
 
     public async Task<IEnumerable<GetActivitiesResult>> GetActivities(GetActivitiesRequest request, string userId)
     {
-        var activities =  await _uow.ActivityRepo.WhereAsync(a => a.IsPrivate == request.IsPrivate && a.User.Id == Guid.Parse(userId));
+        var activities =  await _uow.ActivityRepo.WhereAsync(a => a.IsPrivate == request.IsPrivate && a.User.UserGuid == Guid.Parse(userId));
 
         return activities.Select(a => a.ToGetActivitiesResult());
     }

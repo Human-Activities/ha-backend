@@ -40,9 +40,10 @@ namespace API.Controllers
         public async Task<IActionResult> GetGroups()
         {
             string userId = HttpContext.User.FindFirstValue("id");
-            var result = await _groupService.GetGroups(userId);
+            //var result = await _groupService.GetGroups(userId);
 
-            return Ok(result);
+            //return Ok(result);
+            return Ok();
         }
 
         [HttpPut("edit")]

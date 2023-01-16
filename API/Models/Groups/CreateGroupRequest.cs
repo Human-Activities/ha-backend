@@ -8,6 +8,6 @@ namespace API.Models.Groups
 
         public string Description { get; set; }
 
-        public virtual ICollection<Guid> UserGuids { get; set; }
+        public virtual ICollection<Guid> UserGuids { get; set; } // move it to add user to group endpoint
     }
 }

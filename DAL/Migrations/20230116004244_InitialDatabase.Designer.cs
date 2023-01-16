@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(HumanActivitiesDataContext))]
-    [Migration("20230111230021_AddedUserToActivity")]
-    partial class AddedUserToActivity
+    [Migration("20230116004244_InitialDatabase")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -32,6 +32,10 @@ namespace DAL.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("ActivityGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -46,8 +50,8 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -64,12 +68,16 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("CalendarGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -86,8 +94,12 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ActivityId")
+                    b.Property<int>("ActivityId")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("CategoryGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -107,6 +119,10 @@ namespace DAL.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CostGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<int>("CostType")
                         .HasColumnType("integer");
@@ -143,6 +159,10 @@ namespace DAL.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("EventGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -169,6 +189,10 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("GroupGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -176,6 +200,31 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.Section", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("SectionGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ToDoListId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ToDoListTemplateId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToDoListTemplateId");
+
+                    b.ToTable("Section");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Task", b =>
@@ -196,15 +245,16 @@ namespace DAL.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<int>("ToDoListId")
+                    b.Property<int>("SectionId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ToDoListTemplateId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("TaskGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ToDoListTemplateId");
+                    b.HasIndex("SectionId");
 
                     b.ToTable("Tasks");
                 });
@@ -217,6 +267,10 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -224,31 +278,35 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("ToDoListTemplateGuid")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("ToDoListType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ToDoListTemplates");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("CostId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("DateOfBirth")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Login")
@@ -256,7 +314,6 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
@@ -266,43 +323,95 @@ namespace DAL.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("UserGuid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.UserCosts", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CostId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CostId");
 
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCosts");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.UserGroups", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
                     b.HasIndex("GroupId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("UserGroups");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserIdentity", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Salt")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("UserId");
+                    b.Property<Guid>("UserGuid")
+                        .HasColumnType("uuid");
 
-                    b.ToTable("UserIdentity", (string)null);
+                    b.HasKey("Id");
+
+                    b.ToTable("UserIdentities");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserRefreshToken", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("UserId");
+                    b.Property<Guid>("UserGuid")
+                        .HasColumnType("uuid");
 
-                    b.ToTable("UserRefreshToken", (string)null);
+                    b.HasKey("Id");
+
+                    b.ToTable("UserRefreshTokens");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserRole", b =>
@@ -327,8 +436,8 @@ namespace DAL.Migrations
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("Activities")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Activities_User_UserId");
 
                     b.Navigation("User");
                 });
@@ -338,17 +447,21 @@ namespace DAL.Migrations
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("Calendars")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Calendars_User_UserId");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Category", b =>
                 {
-                    b.HasOne("DAL.DataEntities.Activity", null)
+                    b.HasOne("DAL.DataEntities.Activity", "Activity")
                         .WithMany("Categories")
-                        .HasForeignKey("ActivityId");
+                        .HasForeignKey("ActivityId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Category_Activity_ActivityId");
+
+                    b.Navigation("Activity");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Event", b =>
@@ -356,47 +469,95 @@ namespace DAL.Migrations
                     b.HasOne("DAL.DataEntities.Calendar", "Calendar")
                         .WithMany("Events")
                         .HasForeignKey("CalendarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Category_Calendar_CalendarId");
 
                     b.Navigation("Calendar");
                 });
 
+            modelBuilder.Entity("DAL.DataEntities.Section", b =>
+                {
+                    b.HasOne("DAL.DataEntities.ToDoListTemplate", null)
+                        .WithMany("Sections")
+                        .HasForeignKey("ToDoListTemplateId");
+                });
+
             modelBuilder.Entity("DAL.DataEntities.Task", b =>
                 {
-                    b.HasOne("DAL.DataEntities.ToDoListTemplate", "ToDoListTemplate")
+                    b.HasOne("DAL.DataEntities.Section", "Section")
                         .WithMany("Tasks")
-                        .HasForeignKey("ToDoListTemplateId")
+                        .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ToDoListTemplate");
+                    b.Navigation("Section");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.ToDoListTemplate", b =>
+                {
+                    b.HasOne("DAL.DataEntities.User", "User")
+                        .WithMany("ToDoListTemplates")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.User", b =>
                 {
-                    b.HasOne("DAL.DataEntities.Cost", null)
-                        .WithMany("Users")
-                        .HasForeignKey("CostId");
-
-                    b.HasOne("DAL.DataEntities.Group", null)
-                        .WithMany("Users")
-                        .HasForeignKey("GroupId");
-
                     b.HasOne("DAL.DataEntities.UserRole", "UserRole")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .IsRequired()
-                        .HasConstraintName("FK_User_UserRoleId");
+                        .HasConstraintName("FK_user_user_role_id");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.UserCosts", b =>
+                {
+                    b.HasOne("DAL.DataEntities.Cost", "Cost")
+                        .WithMany("UserCosts")
+                        .HasForeignKey("CostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.DataEntities.User", "User")
+                        .WithMany("UserCosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cost");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.UserGroups", b =>
+                {
+                    b.HasOne("DAL.DataEntities.Group", "Group")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.DataEntities.User", "User")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserIdentity", b =>
                 {
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -407,7 +568,7 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -426,17 +587,22 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.DataEntities.Cost", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("UserCosts");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Group", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("UserGroups");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.Section", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.ToDoListTemplate", b =>
                 {
-                    b.Navigation("Tasks");
+                    b.Navigation("Sections");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.User", b =>
@@ -444,6 +610,12 @@ namespace DAL.Migrations
                     b.Navigation("Activities");
 
                     b.Navigation("Calendars");
+
+                    b.Navigation("ToDoListTemplates");
+
+                    b.Navigation("UserCosts");
+
+                    b.Navigation("UserGroups");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserRole", b =>

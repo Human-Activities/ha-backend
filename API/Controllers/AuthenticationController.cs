@@ -81,7 +81,7 @@ namespace API.Controllers
 
             UserIdentity createdUserIdentity = new UserIdentity()
             {
-                UserId = createdUser.Id,
+                UserGuid = createdUser.UserGuid,
                 Salt = salt
             };
 
@@ -103,7 +103,7 @@ namespace API.Controllers
 
             if (user != null)
             {
-                UserIdentity userIdentity = await _uow.UserIdentityRepo.SingleOrDefaultAsync(ui => ui.UserId == user.Id);
+                UserIdentity userIdentity = await _uow.UserIdentityRepo.SingleOrDefaultAsync(ui => ui.UserGuid == user.UserGuid);
                 string salt = userIdentity.Salt;
                 string pepper = _configuration.GetValue<string>("PasswordSettings:Pepper");
                 string passwordHash = _passwordHasher.Hash(loginModel.Password + pepper, salt);
@@ -134,7 +134,7 @@ namespace API.Controllers
 
             string userId = HttpContext.User.FindFirstValue("id");
 
-            UserRefreshToken? userRefreshToken = await _uow.UserRefreshTokenRepo.SingleOrDefaultAsync(rt => rt.UserId == Guid.Parse(userId));
+            UserRefreshToken? userRefreshToken = await _uow.UserRefreshTokenRepo.SingleOrDefaultAsync(rt => rt.UserGuid == Guid.Parse(userId));
             if (userRefreshToken == null)
             {
                 return NotFound("Invalid refresh token");
@@ -146,7 +146,7 @@ namespace API.Controllers
                 return BadRequest("Invalid access token");
             }
 
-            User? user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Id == Guid.Parse(userId));
+            User? user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == Guid.Parse(userId));
             if (user == null)
             {
                 return NotFound("User not found");
@@ -160,11 +160,11 @@ namespace API.Controllers
         public async Task<IActionResult> Logout()
         {
             string rawUserId = HttpContext.User.FindFirstValue("id");
-            if (!Guid.TryParse(rawUserId, out Guid userId))
+            if (!Guid.TryParse(rawUserId, out Guid userGuid))
             {
                 return Unauthorized();
             }
-            UserRefreshToken userRefreshToken = await _uow.UserRefreshTokenRepo.SingleOrDefaultAsync(urt => urt.UserId == userId);
+            UserRefreshToken userRefreshToken = await _uow.UserRefreshTokenRepo.SingleOrDefaultAsync(urt => urt.UserGuid == userGuid);
             _uow.UserRefreshTokenRepo.Remove(userRefreshToken);
             await _uow.CompleteAsync();
 

@@ -23,7 +23,7 @@ namespace API.Authenticators
             string accessToken = _accessTokenGenerator.GenerateToken(user, userRole);
             string refreshToken = _refreshTokenGenerator.GenerateToken();
 
-            UserRefreshToken userRefreshToken = await unitOfWork.UserRefreshTokenRepo.SingleOrDefaultAsync(urt => urt.UserId == user.Id);
+            UserRefreshToken userRefreshToken = await unitOfWork.UserRefreshTokenRepo.SingleOrDefaultAsync(urt => urt.UserGuid == user.UserGuid);
 
             if (userRefreshToken != null)
             {
@@ -35,7 +35,7 @@ namespace API.Authenticators
                 userRefreshToken = new UserRefreshToken
                 {
                     Token = refreshToken,
-                    UserId = user.Id
+                    UserGuid = user.UserGuid
                 };
                 await unitOfWork.UserRefreshTokenRepo.AddAsync(userRefreshToken);
             }
@@ -43,7 +43,7 @@ namespace API.Authenticators
 
             return new RequestResult
             {
-                UserId = user.Id,
+                UserId = user.UserGuid,
                 Successful = true,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken

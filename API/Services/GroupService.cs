@@ -23,33 +23,33 @@ namespace API.Services
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "Group name can't be empty");
 
-            var users = new List<User>();
+            var userGroups = new List<UserGroups>();
 
-            if (request.UserGuids.Any())
-            {
-                foreach (var userGuid in request.UserGuids)
-                {
-                    var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Id == userGuid);
+            //if (request.UserGuids.Any())
+            //{
+            //    foreach (var userGuid in request.UserGuids)
+            //    {
+            //        var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
 
-                    if (user != null)
-                    {
-                        users.Add(user);
-                    }
-                }
-            }
+            //        if (user != null)
+            //        {
+            //            userGroups.Add( user);
+            //        }
+            //    }
+            //}
 
-            if (!users.Any())
-                throw new OperationException(StatusCodes.Status400BadRequest, "Can't create group without any user.");
+            //if (!users.Any())
+            //    throw new OperationException(StatusCodes.Status400BadRequest, "Can't create group without any user.");
 
-            var group = new Group
-            {
-                Name = request.Name,
-                Description = request.Description,
-                Users = users
-            };
+            //var group = new Group
+            //{
+            //    Name = request.Name,
+            //    Description = request.Description,
+            //    Users = users
+            //};
 
-            await _uow.GroupRepo.AddAsync(group);
-            await _uow.CompleteAsync();
+            //await _uow.GroupRepo.AddAsync(group);
+            //await _uow.CompleteAsync();
 
             return new CreateGroupResult("Group has been created succesfully!");
         }
@@ -62,21 +62,21 @@ namespace API.Services
             {
                 Name = group.Name,
                 Description = group.Description,
-                Users = group.Users.Select(
+                Users = group.UserGroups.Select(
                     u => new UserViewModel
                     {
-                        Name = u.Name,
-                        LastName = u.LastName
+                        Name = u.User.Name,
+                        LastName = u.User.LastName
                     })
             };
         }
 
-        public async Task<IEnumerable<GetGroupResult>> GetGroups(string userId)
-        {
-            var groups = await _uow.GroupRepo.WhereAsync(g => g.Users.Any( u => u.Id == Guid.Parse(userId)));
+        //public async Task<IEnumerable<GetGroupResult>> GetGroups(string userId)
+        //{
+        //    var groups = await _uow.GroupRepo.WhereAsync(g => g.Users.Any(u => u.UserGuid == Guid.Parse(userId)));
 
-            return groups.Select(g => g.ToGetActivitiesResult());
-        }
+        //    return groups.Select(g => g.ToGetActivitiesResult());
+        //}
 
         public async Task<EditGroupResult> EditGroup(EditGroupRequest request)
         {
@@ -94,7 +94,7 @@ namespace API.Services
             {
                 foreach (var userGuid in request.UserGuids)
                 {
-                    var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Id == userGuid);
+                    var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
 
                     if (user != null)
                     {
@@ -108,7 +108,7 @@ namespace API.Services
 
             group.Name = request.Name;
             group.Description = request.Description;
-            group.Users = users;
+            //group.Users = users;
 
             _uow.GroupRepo.Update(group);
             await _uow.CompleteAsync();
@@ -139,12 +139,12 @@ public static class GroupsServiceExtensions
         {
             Name = group.Name,
             Description = group.Description,
-            Users = group.Users.Select(
-                    u => new UserViewModel
-                    {
-                        Name = u.Name,
-                        LastName = u.LastName
-                    })
+            //Users = group.Users.Select(
+            //        u => new UserViewModel
+            //        {
+            //            Name = u.Name,
+            //            LastName = u.LastName
+            //        })
         };
     }
 }

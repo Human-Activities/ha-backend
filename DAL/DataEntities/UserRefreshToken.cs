@@ -7,7 +7,11 @@ namespace DAL.DataEntities
     public class UserRefreshToken
     {
         [ForeignKey("User")]
-        public Guid UserId { get; set; }
+
+        public int Id { get; set; }
+
+        public Guid UserGuid { get; set; }
+
         public string Token { get; set; }
 
         public virtual User User { get; set; }
