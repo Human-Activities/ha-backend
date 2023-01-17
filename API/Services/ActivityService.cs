@@ -34,12 +34,16 @@ public class ActivityService
         return new CreateActivityResult("Activity has been created succesfully!");
     }
 
-    public async Task<GetActivityResult> GetActivity (int activityId)
+    public async Task<GetActivityResult> GetActivity (string activityGuid)
     {
-        var activity = await _uow.ActivityRepo.FindAsync(activityId);
+        var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == Guid.Parse(activityGuid));
+
+        if (activity == null)
+            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
 
         return new GetActivityResult
         {
+            ActivityGuid = activityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
             IsPrivate = activity.IsPrivate,
@@ -48,7 +52,7 @@ public class ActivityService
         };
     }
 
-    public async Task<IEnumerable<GetActivitiesResult>> GetActivities(GetActivitiesRequest request, string userId)
+    public async Task<IEnumerable<GetActivityResult>> GetActivities(GetActivitiesRequest request, string userId)
     {
         var activities =  await _uow.ActivityRepo.WhereAsync(a => a.IsPrivate == request.IsPrivate && a.User.UserGuid == Guid.Parse(userId));
 
@@ -60,7 +64,7 @@ public class ActivityService
         if (request.Name.IsNullOrEmpty())
             throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
 
-        var activity = await _uow.ActivityRepo.FindAsync(request.Id);
+        var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == Guid.Parse(request.ActivityGuid));
 
         if (activity == null)
             throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
@@ -76,9 +80,9 @@ public class ActivityService
         return new EditActivityResult("Activity has been edited successfully!");
     }
 
-    public async Task<DeleteActivityResult> DeleteActivity (int activityId)
+    public async Task<DeleteActivityResult> DeleteActivity (string activityGuid)
     {
-        var activity = await _uow.ActivityRepo.FindAsync(activityId);
+        var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == Guid.Parse(activityGuid));
 
         if (activity == null)
             throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
@@ -92,11 +96,11 @@ public class ActivityService
 
 public static class ActivityServiceExtensions
 {
-    public static GetActivitiesResult ToGetActivitiesResult(this Activity activity)
+    public static GetActivityResult ToGetActivitiesResult(this Activity activity)
     {
-        return new GetActivitiesResult
+        return new GetActivityResult
         {
-            Id = activity.Id,
+            ActivityGuid = activity.ActivityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
             IsPrivate = activity.IsPrivate,

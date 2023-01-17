@@ -5,8 +5,7 @@ namespace DAL.DataEntities
     public class UserIdentity
     {
         [ForeignKey("User")]
-
-        public int Id { get; set; }
+        public int UserId { get; set; }
 
         public Guid UserGuid { get; set; }
 

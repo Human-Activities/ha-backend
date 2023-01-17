@@ -53,6 +53,7 @@ namespace API.Services
 
             return new GetGroupResult
             {
+                GroupGuid = group.GroupGuid.ToString(),
                 Name = group.Name,
                 Description = group.Description,
                 Users = group.UserGroups.Select(
@@ -122,6 +123,7 @@ public static class GroupsServiceExtensions
     {
         return new GetGroupResult
         {
+            GroupGuid = group.GroupGuid.ToString(),
             Name = group.Name,
             Description = group.Description,
             Users = group.UserGroups.Select(

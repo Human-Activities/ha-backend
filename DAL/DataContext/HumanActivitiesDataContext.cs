@@ -21,9 +21,12 @@ namespace DAL.DataContext
         public virtual DbSet<DataEntities.Task> Tasks { get; set; }
         public virtual DbSet<ToDoListTemplate> ToDoListTemplates { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserCosts> UserCosts { get; set; }
+        public virtual DbSet<UserGroups> UserGroups { get; set; }
         public virtual DbSet<UserIdentity> UserIdentities { get; set; }
         public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<Section> Sections { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -129,12 +132,16 @@ namespace DAL.DataContext
 
             modelBuilder.Entity<UserIdentity>(entity =>
             {
+                entity.HasKey(e => e.UserId);
+
                 entity.Property(e => e.Salt)
                     .IsRequired();
             });
 
             modelBuilder.Entity<UserRefreshToken>(entity =>
             {
+                entity.HasKey(e => e.UserId);
+
                 entity.Property(e => e.Token)
                     .IsRequired();
             });

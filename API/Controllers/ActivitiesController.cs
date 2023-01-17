@@ -1,5 +1,4 @@
 ﻿using API.Models.Activities;
-using API.Models.TransferObjects;
 using API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,17 +27,17 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get/{activityId:int}")]
+        [HttpGet("get/{activityGuid:string}")]
         [ProducesResponseType(typeof(GetActivityResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetActvities(int activityId)
+        public async Task<IActionResult> GetActvity(string activityGuid)
         {
-            var result = await _activityService.GetActivity(activityId);
+            var result = await _activityService.GetActivity(activityGuid);
 
             return Ok(result);
         }
 
         [HttpGet("get")]
-        [ProducesResponseType(typeof(IEnumerable<GetActivitiesResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<GetActivityResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvities(GetActivitiesRequest request)
         {
             string userId = HttpContext.User.FindFirstValue("id");
@@ -56,11 +55,11 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete/{activityId:int}")]
+        [HttpDelete("delete/{activityGuid:string}")]
         [ProducesResponseType(typeof(DeleteActivityResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeleteActivity(int activityId)
+        public async Task<IActionResult> DeleteActivity(string activityGuid)
         {
-            var result = await _activityService.DeleteActivity(activityId);
+            var result = await _activityService.DeleteActivity(activityGuid);
 
             return Ok(result);
         }
