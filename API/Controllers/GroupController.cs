@@ -21,16 +21,17 @@ namespace API.Controllers
         [ProducesResponseType(typeof(CreateGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
-            var result = await _groupService.CreateGroup(request);
+            int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
+            var result = await _groupService.CreateGroup(request, userId);
 
             return Ok(result);
         }
 
-        [HttpGet("get/{groupId:int}")]
+        [HttpGet("get/{groupGuid:string}")]
         [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetGroup(int groupId)
+        public async Task<IActionResult> GetGroup(string groupGuid)
         {
-            var result = await _groupService.GetGroup(groupId);
+            var result = await _groupService.GetGroup(groupGuid);
 
             return Ok(result);
         }
@@ -39,7 +40,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(IEnumerable<GetGroupResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGroups()
         {
-            string userId = HttpContext.User.FindFirstValue("id");
+            int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _groupService.GetGroups(userId);
 
             return Ok(result);
@@ -54,11 +55,11 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete/{groupId:int}")]
+        [HttpDelete("delete/{groupGuid:string}")]
         [ProducesResponseType(typeof(DeleteGroupResult), StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeleteGroup(int groupId)
+        public async Task<IActionResult> DeleteGroup(string groupGuid)
         {
-            var result = await _groupService.DeleteGroup(groupId);
+            var result = await _groupService.DeleteGroup(groupGuid);
 
             return Ok(result);
         }

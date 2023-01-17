@@ -1,12 +1,10 @@
-﻿namespace API.Models
+﻿namespace API.Models.Authentication
 {
-    public class RequestResult
+    public class LoginResult
     {
-        public Guid UserId { get; set; }
+        public Guid UserGuid { get; set; }
 
         public bool Successful { get; set; }
-
-        public string Message { get; set; }
 
         public string AccessToken { get; set; }
 

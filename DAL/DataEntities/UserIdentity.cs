@@ -5,8 +5,12 @@ namespace DAL.DataEntities
     public class UserIdentity
     {
         [ForeignKey("User")]
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
+
+        public Guid UserGuid { get; set; }
+
         public string Salt { get; set; }
+
 
         public virtual User User { get; set; }
     }

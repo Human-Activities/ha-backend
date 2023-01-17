@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using API.Models.Authentication;
 using DAL.DataEntities;
 using DAL.UnitOfWork;
 using Services;
@@ -17,13 +18,13 @@ namespace API.Authenticators
             _refreshTokenGenerator = ServicesFactory.CreateRefreshTokenGenerator(configuration);
         }
 
-        public async Task<RequestResult> Authenticate(User user, IUnitOfWork unitOfWork)
+        public async Task<LoginResult> Authenticate(User user, IUnitOfWork unitOfWork)
         {
-            UserRole userRole = await unitOfWork.UserRoleRepo.SingleOrDefaultAsync(role => role.Id == user.RoleId);
-            string accessToken = _accessTokenGenerator.GenerateToken(user, userRole);
-            string refreshToken = _refreshTokenGenerator.GenerateToken();
+            var userRole = await unitOfWork.UserRoleRepo.SingleOrDefaultAsync(role => role.Id == user.RoleId);
+            var accessToken = _accessTokenGenerator.GenerateToken(user, userRole);
+            var refreshToken = _refreshTokenGenerator.GenerateToken();
 
-            UserRefreshToken userRefreshToken = await unitOfWork.UserRefreshTokenRepo.SingleOrDefaultAsync(urt => urt.UserId == user.Id);
+            var userRefreshToken = await unitOfWork.UserRefreshTokenRepo.SingleOrDefaultAsync(urt => urt.UserGuid == user.UserGuid);
 
             if (userRefreshToken != null)
             {
@@ -35,30 +36,32 @@ namespace API.Authenticators
                 userRefreshToken = new UserRefreshToken
                 {
                     Token = refreshToken,
-                    UserId = user.Id
+                    UserGuid = user.UserGuid
                 };
                 await unitOfWork.UserRefreshTokenRepo.AddAsync(userRefreshToken);
             }
             await unitOfWork.CompleteAsync();
 
-            return new RequestResult
+            return new LoginResult
             {
-                UserId = user.Id,
+                UserGuid = user.UserGuid,
                 Successful = true,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };
         }
 
-        public async Task<RequestResult> RefreshAccessToken(User user, string refreshToken, IUnitOfWork unitOfWork)
+        public async Task<RefreshResult> RefreshAccessToken(User user, string refreshToken, IUnitOfWork unitOfWork)
         {
             UserRole userRole = await unitOfWork.UserRoleRepo.SingleOrDefaultAsync(role => role.Id == user.RoleId);
             string accessToken = _accessTokenGenerator.GenerateToken(user, userRole);
 
-            return new RequestResult
+            return new RefreshResult
             {
+                UserGuid = user.UserGuid,
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                Successful = true
             };
         }
     }

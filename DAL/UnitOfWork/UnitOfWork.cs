@@ -87,6 +87,19 @@ namespace DAL.UnitOfWork
             }
         }
 
+        private IRepository<Section>? _sectionRepo;
+        public IRepository<Section> SectionRepo
+        {
+            get
+            {
+                if (_sectionRepo == null)
+                {
+                    _sectionRepo = new Repository<Section>(_humanActivitiesDataContext.Sections);
+                }
+                return _sectionRepo;
+            }
+        }
+
         private IRepository<Task>? _taskRepo;
         public IRepository<Task> TaskRepo
         {
@@ -123,6 +136,32 @@ namespace DAL.UnitOfWork
                     _userRepo = new Repository<User>(_humanActivitiesDataContext.Users);
                 }
                 return _userRepo;
+            }
+        }
+
+        private IRepository<UserCosts>? _userCostRepo;
+        public IRepository<UserCosts> UserCostRepo
+        {
+            get
+            {
+                if (_userCostRepo == null)
+                {
+                    _userCostRepo = new Repository<UserCosts>(_humanActivitiesDataContext.UserCosts);
+                }
+                return _userCostRepo;
+            }
+        }
+
+        private IRepository<UserGroups>? _userGroupRepo;
+        public IRepository<UserGroups> UserGroupRepo
+        {
+            get
+            {
+                if (_userGroupRepo == null)
+                {
+                    _userGroupRepo = new Repository<UserGroups>(_humanActivitiesDataContext.UserGroups);
+                }
+                return _userGroupRepo;
             }
         }
 

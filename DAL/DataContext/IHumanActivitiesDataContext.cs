@@ -12,7 +12,10 @@ namespace DAL.DataContext
         DbSet<Event> Events { get; set; }
         DbSet<Group> Groups { get; set; }
         DbSet<DataEntities.Task> Tasks { get; set; }
+        DbSet<Section> Sections { get; set; }
         DbSet<ToDoListTemplate> ToDoListTemplates { get; set; }
+        DbSet<UserCosts> UserCosts { get; set; }
+        DbSet<UserGroups> UserGroups { get; set; }
         DbSet<UserIdentity> UserIdentities { get; set; }
         DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         DbSet<UserRole> UserRoles { get; set; }

@@ -2,6 +2,6 @@
 {
     public class EditActivityRequest : CreateActivityRequest
     {
-        public int Id { get; set; }
+        public string ActivityGuid { get; set; }
     }
 }

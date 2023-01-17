@@ -1,6 +1,6 @@
-﻿namespace API.Models.TransferObjects
+﻿namespace API.Models.Authentication
 {
-    public class RegisterModel
+    public class RegisterRequest
     {
         public string Name { get; set; }
 

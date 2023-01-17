@@ -7,6 +7,7 @@ namespace API.Extensions
         public static IServiceCollection AddDomainServices(this IServiceCollection services)
         {
             services.AddTransient<ActivityService>();
+            services.AddTransient<AuthenticationService>();
             services.AddTransient<GroupService>();
 
             return services;

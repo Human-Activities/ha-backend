@@ -2,6 +2,6 @@
 {
     public class EditGroupRequest : CreateGroupRequest
     {
-        public int Id { get; set; }
+        public string GroupGuid { get; set; }
     }
 }
