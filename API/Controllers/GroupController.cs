@@ -27,7 +27,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get/{groupGuid:string}")]
+        [HttpGet("get/{groupGuid}")]
         [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGroup(string groupGuid)
         {
@@ -55,7 +55,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete/{groupGuid:string}")]
+        [HttpDelete("delete/{groupGuid}")]
         [ProducesResponseType(typeof(DeleteGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteGroup(string groupGuid)
         {

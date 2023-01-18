@@ -19,7 +19,7 @@ namespace API.Services
         private readonly RefreshTokenValidator _refreshTokenValidator;
         private readonly AccessTokenValidator _accessTokenValidator;
 
-        public AuthenticationService(IConfiguration configuration, Authenticator authenticator, AuthenticationService authenticationService)
+        public AuthenticationService(IConfiguration configuration, Authenticator authenticator)
         {
             _configuration = configuration;
             _uow = DataAccessLayerFactory.CreateUnitOfWork();

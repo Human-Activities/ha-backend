@@ -27,7 +27,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get/{activityGuid:string}")]
+        [HttpGet("get/{activityGuid}")]
         [ProducesResponseType(typeof(GetActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvity(string activityGuid)
         {
@@ -55,7 +55,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("delete/{activityGuid:string}")]
+        [HttpDelete("delete/{activityGuid}")]
         [ProducesResponseType(typeof(DeleteActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteActivity(string activityGuid)
         {
