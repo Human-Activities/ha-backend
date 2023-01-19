@@ -24,11 +24,13 @@ namespace DAL.DataEntities
 
         public ToDoListType ToDoListType { get; set; }
 
+        public bool IsFavourite { get; set; }
+
         public string? Description { get; set; }
 
 
         public virtual User User { get; set; }
 
-        public virtual ICollection<Section> Sections { get; set; }
+        public virtual ICollection<Section>? Sections { get; set; }
     }
 }
