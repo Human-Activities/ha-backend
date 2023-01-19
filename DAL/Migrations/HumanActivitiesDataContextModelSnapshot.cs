@@ -18,9 +18,6 @@ namespace DAL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.2")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -29,504 +26,416 @@ namespace DAL.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("ActivityGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("activity_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsPrivate")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_private");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsTemplate")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_template");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_activities");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_activities_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("activities", (string)null);
+                    b.ToTable("Activities");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Calendar", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("CalendarGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("calendar_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_calendars");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_calendars_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("calendars", (string)null);
+                    b.ToTable("Calendars");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ActivityId")
-                        .HasColumnType("integer")
-                        .HasColumnName("activity_id");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("CategoryGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_categories");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ActivityId")
-                        .HasDatabaseName("ix_categories_activity_id");
+                    b.HasIndex("ActivityId");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Cost", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("CostGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("cost_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("CostType")
-                        .HasColumnType("integer")
-                        .HasColumnName("cost_type");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<double>("Value")
-                        .HasColumnType("double precision")
-                        .HasColumnName("value");
+                        .HasColumnType("double precision");
 
-                    b.HasKey("Id")
-                        .HasName("pk_costs");
+                    b.HasKey("Id");
 
-                    b.ToTable("costs", (string)null);
+                    b.ToTable("Costs");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CalendarId")
-                        .HasColumnType("integer")
-                        .HasColumnName("calendar_id");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day")
-                        .HasColumnType("integer")
-                        .HasColumnName("day");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_time");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("EventGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("event_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_time");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id")
-                        .HasName("pk_events");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CalendarId")
-                        .HasDatabaseName("ix_events_calendar_id");
+                    b.HasIndex("CalendarId");
 
-                    b.ToTable("events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Group", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("GroupGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("group_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_groups");
+                    b.HasKey("Id");
 
-                    b.ToTable("groups", (string)null);
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Section", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("SectionGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("section_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("ToDoListId")
-                        .HasColumnType("integer")
-                        .HasColumnName("to_do_list_id");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ToDoListTemplateId")
-                        .HasColumnType("integer")
-                        .HasColumnName("to_do_list_template_id");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_sections");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ToDoListTemplateId")
-                        .HasDatabaseName("ix_sections_to_do_list_template_id");
+                    b.HasIndex("ToDoListTemplateId");
 
-                    b.ToTable("sections", (string)null);
+                    b.ToTable("Sections");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Task", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDone")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_done");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("text")
-                        .HasColumnName("notes");
+                        .HasColumnType("text");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
 
                     b.Property<int>("SectionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("section_id");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("TaskGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("task_guid");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_tasks");
+                    b.HasKey("Id");
 
-                    b.HasIndex("SectionId")
-                        .HasDatabaseName("ix_tasks_section_id");
+                    b.HasIndex("SectionId");
 
-                    b.ToTable("tasks", (string)null);
+                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.ToDoListTemplate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date_time");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsFavourite")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("ToDoListTemplateGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("to_do_list_template_guid");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("ToDoListType")
-                        .HasColumnType("integer")
-                        .HasColumnName("to_do_list_type");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_to_do_list_templates");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_to_do_list_templates_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("to_do_list_templates", (string)null);
+                    b.ToTable("ToDoListTemplates");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_of_birth");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("text")
-                        .HasColumnName("last_name");
+                        .HasColumnType("text");
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("login");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("password_hash");
+                        .HasColumnType("text");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("integer")
-                        .HasColumnName("role_id");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserGuid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_guid");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_users");
+                    b.HasKey("Id");
 
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_users_role_id");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserCosts", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CostId")
-                        .HasColumnType("integer")
-                        .HasColumnName("cost_id");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user_costs");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CostId")
-                        .HasDatabaseName("ix_user_costs_cost_id");
+                    b.HasIndex("CostId");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_costs_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("user_costs", (string)null);
+                    b.ToTable("UserCosts");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserGroups", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("GroupId")
-                        .HasColumnType("integer")
-                        .HasColumnName("group_id");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user_groups");
+                    b.HasKey("Id");
 
-                    b.HasIndex("GroupId")
-                        .HasDatabaseName("ix_user_groups_group_id");
+                    b.HasIndex("GroupId");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_groups_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("user_groups", (string)null);
+                    b.ToTable("UserGroups");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserIdentity", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Salt")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("salt");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_guid");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("UserId")
-                        .HasName("pk_user_identities");
+                    b.HasKey("UserId");
 
-                    b.ToTable("user_identities", (string)null);
+                    b.ToTable("UserIdentities");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserRefreshToken", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("token");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_guid");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("UserId")
-                        .HasName("pk_user_refresh_tokens");
+                    b.HasKey("UserId");
 
-                    b.ToTable("user_refresh_tokens", (string)null);
+                    b.ToTable("UserRefreshTokens");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user_roles");
+                    b.HasKey("Id");
 
-                    b.ToTable("user_roles", (string)null);
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Activity", b =>
@@ -577,8 +486,7 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.DataEntities.ToDoListTemplate", null)
                         .WithMany("Sections")
-                        .HasForeignKey("ToDoListTemplateId")
-                        .HasConstraintName("fk_sections_to_do_list_templates_to_do_list_template_id");
+                        .HasForeignKey("ToDoListTemplateId");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Task", b =>
@@ -587,8 +495,7 @@ namespace DAL.Migrations
                         .WithMany("Tasks")
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_tasks_sections_section_id");
+                        .IsRequired();
 
                     b.Navigation("Section");
                 });
@@ -599,8 +506,7 @@ namespace DAL.Migrations
                         .WithMany("ToDoListTemplates")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_to_do_list_templates_users_user_id");
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -622,15 +528,13 @@ namespace DAL.Migrations
                         .WithMany("UserCosts")
                         .HasForeignKey("CostId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_costs_costs_cost_id");
+                        .IsRequired();
 
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("UserCosts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_costs_users_user_id");
+                        .IsRequired();
 
                     b.Navigation("Cost");
 
@@ -643,15 +547,13 @@ namespace DAL.Migrations
                         .WithMany("UserGroups")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_groups_groups_group_id");
+                        .IsRequired();
 
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("UserGroups")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_groups_users_user_id");
+                        .IsRequired();
 
                     b.Navigation("Group");
 
@@ -664,8 +566,7 @@ namespace DAL.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_identities_users_user_id");
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -676,8 +577,7 @@ namespace DAL.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_refresh_tokens_users_user_id");
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
