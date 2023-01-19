@@ -1,4 +1,6 @@
-﻿namespace DAL.DataEntities
+﻿using DAL.CommonVariables;
+
+namespace DAL.DataEntities
 {
     public class Task
     {
@@ -11,6 +13,8 @@
         public string? Notes { get; set; }
 
         public bool IsDone { get; set; }
+
+        public TaskPriority Priority { get; set; }
 
         public int SectionId { get; set; }
 

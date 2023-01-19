@@ -6,13 +6,13 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Route("api/group")]
+    [Route("api/groups")]
     [ApiController]
-    public class GroupController : Controller
+    public class GroupsController : Controller
     {
         private readonly GroupService _groupService;
 
-        public GroupController(GroupService groupService)
+        public GroupsController(GroupService groupService)
         {
             _groupService = groupService;
         }

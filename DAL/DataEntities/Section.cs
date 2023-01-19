@@ -16,8 +16,10 @@ namespace DAL.DataEntities
 
         public int ToDoListId { get; set; }
 
+        public string Name { get; set; }
 
-        public virtual ICollection<Task> Tasks { get; set; }
+
+        public virtual ICollection<Task>? Tasks { get; set; }
 
     }
 }
