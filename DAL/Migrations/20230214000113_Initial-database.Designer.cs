@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(HumanActivitiesDataContext))]
-    [Migration("20230119222358_initial_database")]
-    partial class initialdatabase
+    [Migration("20230214000113_Initial-database")]
+    partial class Initialdatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,8 +34,10 @@ namespace DAL.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("ActivityGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -55,6 +57,8 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Activities");
@@ -69,7 +73,6 @@ namespace DAL.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("CalendarGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -94,20 +97,17 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ActivityId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("CategoryGuid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<bool>("IsActivityCategory")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("Value")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("ActivityId");
+                    b.HasKey("Id");
 
                     b.ToTable("Categories");
                 });
@@ -121,7 +121,6 @@ namespace DAL.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("CostGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<int>("CostType")
@@ -160,7 +159,6 @@ namespace DAL.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("EventGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -186,11 +184,9 @@ namespace DAL.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("GroupGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -215,7 +211,6 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid>("SectionGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<int>("ToDoListId")
@@ -256,7 +251,6 @@ namespace DAL.Migrations
                         .HasColumnType("integer");
 
                     b.Property<Guid>("TaskGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -276,7 +270,8 @@ namespace DAL.Migrations
 
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -289,13 +284,12 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid>("ToDoListTemplateGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<int>("ToDoListType")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -334,7 +328,6 @@ namespace DAL.Migrations
                         .HasColumnType("integer");
 
                     b.Property<Guid>("UserGuid")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -443,11 +436,19 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.DataEntities.Activity", b =>
                 {
+                    b.HasOne("DAL.DataEntities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("Activities")
                         .HasForeignKey("UserId")
                         .IsRequired()
                         .HasConstraintName("FK_Activities_User_UserId");
+
+                    b.Navigation("Category");
 
                     b.Navigation("User");
                 });
@@ -461,17 +462,6 @@ namespace DAL.Migrations
                         .HasConstraintName("FK_Calendars_User_UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.Category", b =>
-                {
-                    b.HasOne("DAL.DataEntities.Activity", "Activity")
-                        .WithMany("Categories")
-                        .HasForeignKey("ActivityId")
-                        .IsRequired()
-                        .HasConstraintName("FK_Category_Activity_ActivityId");
-
-                    b.Navigation("Activity");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Event", b =>
@@ -507,9 +497,7 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("ToDoListTemplates")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -583,11 +571,6 @@ namespace DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.Activity", b =>
-                {
-                    b.Navigation("Categories");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Calendar", b =>

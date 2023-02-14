@@ -15,9 +15,8 @@ namespace DAL.DataEntities
         public Guid ToDoListTemplateGuid { get; set; }
 
         [ForeignKey("User")]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedDateTime { get; set; }
 
         public string Name { get; set; }
@@ -29,7 +28,7 @@ namespace DAL.DataEntities
         public string? Description { get; set; }
 
 
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
 
         public virtual ICollection<Section>? Sections { get; set; }
     }
