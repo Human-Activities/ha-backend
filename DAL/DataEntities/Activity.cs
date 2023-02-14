@@ -4,11 +4,6 @@ namespace DAL.DataEntities
 {
     public class Activity
     {
-        public Activity()
-        {
-            Categories = new HashSet<Category>();
-        }
-
         public int Id { get; set; }
 
         public Guid ActivityGuid { get; set; }
@@ -27,6 +22,6 @@ namespace DAL.DataEntities
 
         public virtual User User { get; set; }
 
-        public virtual ICollection<Category> Categories { get; set; }
+        public virtual Category Category { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using DAL.DataEntities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace DAL.DataContext
@@ -34,7 +36,7 @@ namespace DAL.DataContext
             {
                 var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 var connectionString = builder.Build().GetSection("ConnectionStrings").GetSection("HumanActivitiesDB").Value;
-                optionsBuilder.UseLazyLoadingProxies().UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+                optionsBuilder.UseLazyLoadingProxies().UseNpgsql(connectionString);
             }
         }
 
@@ -43,7 +45,7 @@ namespace DAL.DataContext
             modelBuilder.Entity<Activity>(entity =>
             {
                 entity.Property(e => e.ActivityGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.Activities)
@@ -55,7 +57,7 @@ namespace DAL.DataContext
             modelBuilder.Entity<Calendar>(entity =>
             {
                 entity.Property(e => e.CalendarGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.Calendars)
@@ -66,26 +68,20 @@ namespace DAL.DataContext
 
             modelBuilder.Entity<Category>(entity =>
             {
-                entity.Property(e => e.CategoryGuid)
-                .ValueGeneratedOnAdd();
-
-                entity.HasOne(e => e.Activity)
-                    .WithMany(a => a.Categories)
-                    .HasForeignKey(e => e.ActivityId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Category_Activity_ActivityId");
+                //entity.Property(e => e.CategoryGuid)
+                //.HasValueGenerator<GuidValueGenerator>();
             });
 
             modelBuilder.Entity<Cost>(entity =>
             {
                 entity.Property(e => e.CostGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
             });
 
             modelBuilder.Entity<Event>(entity =>
             {
                 entity.Property(e => e.EventGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
 
                 entity.HasOne(e => e.Calendar)
                     .WithMany(c => c.Events)
@@ -97,31 +93,34 @@ namespace DAL.DataContext
             modelBuilder.Entity<Group>(entity =>
             {
                 entity.Property(e => e.GroupGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
             });
 
             modelBuilder.Entity<Section>(entity =>
             {
                 entity.Property(e => e.SectionGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
             });
 
             modelBuilder.Entity<DataEntities.Task>(entity =>
             {
                 entity.Property(e => e.TaskGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
             });
 
             modelBuilder.Entity<ToDoListTemplate>(entity =>
             {
                 entity.Property(e => e.ToDoListTemplateGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
+
+                entity.Property(e => e.CreatedDateTime)
+                .HasDefaultValueSql("now()");
             });
 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.UserGuid)
-                .ValueGeneratedOnAdd();
+                .HasValueGenerator<GuidValueGenerator>();
 
                 entity.HasOne(e => e.UserRole)
                     .WithMany(u => u.Users)

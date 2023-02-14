@@ -48,7 +48,7 @@ public class ActivityService
             Description = activity.Description,
             IsPrivate = activity.IsPrivate,
             IsTemplate = activity.IsTemplate,
-            Categories = activity.Categories
+            Category = activity.Category
         };
     }
 
@@ -105,7 +105,7 @@ public static class ActivityServiceExtensions
             Description = activity.Description,
             IsPrivate = activity.IsPrivate,
             IsTemplate = activity.IsTemplate,
-            Categories = activity.Categories
+            Category = activity.Category
         };
     }
 }
