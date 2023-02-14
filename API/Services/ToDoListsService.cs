@@ -72,7 +72,7 @@ namespace API.Services
             };
         }
 
-        public async Task<IEnumerable<GetToDoListResult>> GetToDoLists(int userId, string groupGuid)
+        public async Task<IEnumerable<GetToDoListResult>> GetToDoLists(int userId, string? groupGuid)
         {
             var toDoLists = new List<GetToDoListResult>();
 
@@ -91,7 +91,7 @@ namespace API.Services
             return toDoLists;
         }
 
-        public async Task<IEnumerable<GetToDoListResult>> GetToDoListTemplates(int userId, string groupGuid)
+        public async Task<IEnumerable<GetToDoListResult>> GetToDoListTemplates(int userId, string? groupGuid)
         {
             var toDoLists = new List<GetToDoListResult>();
 

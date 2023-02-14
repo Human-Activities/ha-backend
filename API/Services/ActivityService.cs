@@ -25,7 +25,7 @@ public class ActivityService
         {
             Name = request.Name,
             Description = request.Description,
-            IsPublic = request.IsPrivate
+            IsPublic = request.IsPublic
         };
 
         await _uow.ActivityRepo.AddAsync(activity);
@@ -46,7 +46,7 @@ public class ActivityService
             ActivityGuid = activityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
-            IsPrivate = activity.IsPublic,
+            IsPublic = activity.IsPublic,
             Category = activity.Category
         };
     }
@@ -70,7 +70,7 @@ public class ActivityService
 
         activity.Name = request.Name;
         activity.Description = request.Description;
-        activity.IsPublic = request.IsPrivate;
+        activity.IsPublic = request.IsPublic;
 
         _uow.ActivityRepo.Update(activity);
         await _uow.CompleteAsync();
@@ -101,7 +101,7 @@ public static class ActivityServiceExtensions
             ActivityGuid = activity.ActivityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
-            IsPrivate = activity.IsPublic,
+            IsPublic = activity.IsPublic,
             Category = activity.Category
         };
     }

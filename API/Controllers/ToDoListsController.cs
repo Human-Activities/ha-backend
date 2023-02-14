@@ -1,5 +1,4 @@
 ﻿using API.Models.ToDoLists;
-using API.Models.ToDoLists;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -36,7 +35,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get/{ToDoListGuid}")]
+        [HttpGet("get-all/{groupGuid}")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetToDoLists(string? groupGuid) // jesli ToDoListId null to wez po userid
         {
@@ -46,7 +45,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get-templates/{ToDoListGuid}")]
+        [HttpGet("get-templates/{groupGuid}")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetToDoListTemplates(string? groupGuid)
         {
