@@ -36,13 +36,13 @@ namespace DAL.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsPrivate")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsTemplate")
+                    b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -61,7 +61,7 @@ namespace DAL.Migrations
                     b.ToTable("Activities");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.Calendar", b =>
+            modelBuilder.Entity("DAL.DataEntities.Bill", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,21 +69,75 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CalendarGuid")
+                    b.Property<int>("AccountBillNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("BillGuid")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<double>("TotalValue")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Calendars");
+                    b.ToTable("Bills");
+                });
+
+            modelBuilder.Entity("DAL.DataEntities.BillItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BillId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("BillItemGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("TotalValue")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BillItem");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Category", b =>
@@ -107,69 +161,6 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.Cost", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("CostGuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("CostType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<double>("Value")
-                        .HasColumnType("double precision");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Costs");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CalendarId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Day")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("EventGuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CalendarId");
-
-                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Group", b =>
@@ -213,12 +204,9 @@ namespace DAL.Migrations
                     b.Property<int>("ToDoListId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ToDoListTemplateId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ToDoListTemplateId");
+                    b.HasIndex("ToDoListId");
 
                     b.ToTable("Sections");
                 });
@@ -257,7 +245,7 @@ namespace DAL.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.ToDoListTemplate", b =>
+            modelBuilder.Entity("DAL.DataEntities.ToDoList", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,13 +253,16 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDateTime")
+                    b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsFavourite")
                         .HasColumnType("boolean");
@@ -280,7 +271,7 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ToDoListTemplateGuid")
+                    b.Property<Guid>("ToDoListGuid")
                         .HasColumnType("uuid");
 
                     b.Property<int>("ToDoListType")
@@ -291,9 +282,11 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("ToDoListTemplates");
+                    b.ToTable("ToDoList");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.User", b =>
@@ -332,29 +325,6 @@ namespace DAL.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.UserCosts", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CostId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserCosts");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserGroups", b =>
@@ -450,33 +420,49 @@ namespace DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.Calendar", b =>
+            modelBuilder.Entity("DAL.DataEntities.Bill", b =>
                 {
+                    b.HasOne("DAL.DataEntities.Group", "Group")
+                        .WithMany("Bills")
+                        .HasForeignKey("GroupId");
+
                     b.HasOne("DAL.DataEntities.User", "User")
-                        .WithMany("Calendars")
+                        .WithMany("Bills")
                         .HasForeignKey("UserId")
-                        .IsRequired()
-                        .HasConstraintName("FK_Calendars_User_UserId");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.Event", b =>
+            modelBuilder.Entity("DAL.DataEntities.BillItem", b =>
                 {
-                    b.HasOne("DAL.DataEntities.Calendar", "Calendar")
-                        .WithMany("Events")
-                        .HasForeignKey("CalendarId")
-                        .IsRequired()
-                        .HasConstraintName("FK_Category_Calendar_CalendarId");
+                    b.HasOne("DAL.DataEntities.Bill", "Bill")
+                        .WithMany("BillItems")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Calendar");
+                    b.HasOne("DAL.DataEntities.User", "User")
+                        .WithMany("BillItems")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Section", b =>
                 {
-                    b.HasOne("DAL.DataEntities.ToDoListTemplate", null)
+                    b.HasOne("DAL.DataEntities.ToDoList", null)
                         .WithMany("Sections")
-                        .HasForeignKey("ToDoListTemplateId");
+                        .HasForeignKey("ToDoListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Task", b =>
@@ -490,11 +476,17 @@ namespace DAL.Migrations
                     b.Navigation("Section");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.ToDoListTemplate", b =>
+            modelBuilder.Entity("DAL.DataEntities.ToDoList", b =>
                 {
+                    b.HasOne("DAL.DataEntities.Group", "Group")
+                        .WithMany("ToDoLists")
+                        .HasForeignKey("GroupId");
+
                     b.HasOne("DAL.DataEntities.User", "User")
-                        .WithMany("ToDoListTemplates")
+                        .WithMany("ToDoLists")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -508,25 +500,6 @@ namespace DAL.Migrations
                         .HasConstraintName("FK_user_user_role_id");
 
                     b.Navigation("UserRole");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.UserCosts", b =>
-                {
-                    b.HasOne("DAL.DataEntities.Cost", "Cost")
-                        .WithMany("UserCosts")
-                        .HasForeignKey("CostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.DataEntities.User", "User")
-                        .WithMany("UserCosts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cost");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.UserGroups", b =>
@@ -570,18 +543,17 @@ namespace DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.Calendar", b =>
+            modelBuilder.Entity("DAL.DataEntities.Bill", b =>
                 {
-                    b.Navigation("Events");
-                });
-
-            modelBuilder.Entity("DAL.DataEntities.Cost", b =>
-                {
-                    b.Navigation("UserCosts");
+                    b.Navigation("BillItems");
                 });
 
             modelBuilder.Entity("DAL.DataEntities.Group", b =>
                 {
+                    b.Navigation("Bills");
+
+                    b.Navigation("ToDoLists");
+
                     b.Navigation("UserGroups");
                 });
 
@@ -590,7 +562,7 @@ namespace DAL.Migrations
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("DAL.DataEntities.ToDoListTemplate", b =>
+            modelBuilder.Entity("DAL.DataEntities.ToDoList", b =>
                 {
                     b.Navigation("Sections");
                 });
@@ -599,11 +571,11 @@ namespace DAL.Migrations
                 {
                     b.Navigation("Activities");
 
-                    b.Navigation("Calendars");
+                    b.Navigation("BillItems");
 
-                    b.Navigation("ToDoListTemplates");
+                    b.Navigation("Bills");
 
-                    b.Navigation("UserCosts");
+                    b.Navigation("ToDoLists");
 
                     b.Navigation("UserGroups");
                 });

@@ -22,9 +22,6 @@ namespace API.Controllers
         {
             try
             {
-
-                var dupa = await _uow.CategoryRepo.GetAllAsync();
-
                 var categories = new List<Category> {
                 new Category
                 {
@@ -162,9 +159,9 @@ namespace API.Controllers
         {
             try
             {
-                var todoListTemplates = new List<ToDoListTemplate>
+                var todoLists = new List<ToDoList>
             {
-                new ToDoListTemplate
+                new ToDoList
                 {
                     Name = "Week",
                     ToDoListType = DAL.CommonVariables.ToDoListType.Template,
@@ -202,7 +199,7 @@ namespace API.Controllers
                         }
                     }
                 },
-                new ToDoListTemplate
+                new ToDoList
                 {
                     Name = "Shopping",
                     ToDoListType = DAL.CommonVariables.ToDoListType.Template,
@@ -228,7 +225,7 @@ namespace API.Controllers
                         }
                     }
                 },
-                new ToDoListTemplate
+                new ToDoList
                 {
                     Name = "Trip",
                     ToDoListType = DAL.CommonVariables.ToDoListType.Template,
@@ -254,7 +251,7 @@ namespace API.Controllers
                         }
                     }
                 },
-                new ToDoListTemplate
+                new ToDoList
                 {
                     Name = "Party",
                     ToDoListType = DAL.CommonVariables.ToDoListType.Template,
@@ -276,7 +273,7 @@ namespace API.Controllers
                         }
                     }
                 },
-                new ToDoListTemplate
+                new ToDoList
                 {
                     Name = "Language learning",
                     ToDoListType = DAL.CommonVariables.ToDoListType.Template,
@@ -294,7 +291,7 @@ namespace API.Controllers
                         }
                     }
                 },
-                new ToDoListTemplate
+                new ToDoList
                 {
                     Name = "Exercies",
                     ToDoListType = DAL.CommonVariables.ToDoListType.Template,
@@ -318,7 +315,7 @@ namespace API.Controllers
                 }
             };
 
-                await _uow.TodoListTemplateRepo.AddRangeAsync(todoListTemplates);
+                await _uow.TodoListRepo.AddRangeAsync(todoLists);
                 await _uow.CompleteAsync();
             }
             catch (Exception ex)

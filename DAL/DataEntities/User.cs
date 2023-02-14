@@ -4,10 +4,10 @@
     {
         public User()
         {
-            Calendars = new HashSet<Calendar>();
             Activities= new HashSet<Activity>();
-            ToDoListTemplates = new HashSet<ToDoListTemplate>();
-            UserCosts = new HashSet<UserCosts>();
+            Bills = new HashSet<Bill>();
+            BillItems = new HashSet<BillItem>();
+            ToDoLists = new HashSet<ToDoList>();
             UserGroups = new HashSet<UserGroups>();
         }
 
@@ -30,13 +30,13 @@
 
         public virtual UserRole UserRole { get; set; }
 
-        public virtual ICollection<Calendar> Calendars { get; set; }
-
         public virtual ICollection<Activity> Activities{ get; set; }
 
-        public virtual ICollection<ToDoListTemplate> ToDoListTemplates{ get; set; }
+        public virtual ICollection<Bill> Bills { get; set; }
 
-        public virtual ICollection<UserCosts> UserCosts { get; set; }
+        public virtual ICollection<BillItem> BillItems { get; set; }
+
+        public virtual ICollection<ToDoList> ToDoLists{ get; set; }
 
         public virtual ICollection<UserGroups> UserGroups { get; set; }
     }

@@ -22,16 +22,29 @@ namespace DAL.UnitOfWork
             }
         }
 
-        private IRepository<Calendar>? _calendarRepo;
-        public IRepository<Calendar> CalendarRepo
+        private IRepository<Bill>? _billRepo;
+        public IRepository<Bill> BillRepo
         {
             get
             {
-                if (_calendarRepo == null)
+                if (_billRepo == null)
                 {
-                    _calendarRepo = new Repository<Calendar>(_humanActivitiesDataContext.Calendars);
+                    _billRepo = new Repository<Bill>(_humanActivitiesDataContext.Bills);
                 }
-                return _calendarRepo;
+                return _billRepo;
+            }
+        }
+
+        private IRepository<BillItem>? _billItemRepo;
+        public IRepository<BillItem> BillItemRepo
+        {
+            get
+            {
+                if (_billItemRepo == null)
+                {
+                    _billItemRepo = new Repository<BillItem>(_humanActivitiesDataContext.BillItems);
+                }
+                return _billItemRepo;
             }
         }
 
@@ -45,32 +58,6 @@ namespace DAL.UnitOfWork
                     _categoryRepo = new Repository<Category>(_humanActivitiesDataContext.Categories);
                 }
                 return _categoryRepo;
-            }
-        }
-
-        private IRepository<Cost>? _costRepo;
-        public IRepository<Cost> CostRepo
-        {
-            get
-            {
-                if (_costRepo == null)
-                {
-                    _costRepo = new Repository<Cost>(_humanActivitiesDataContext.Costs);
-                }
-                return _costRepo;
-            }
-        }
-
-        private IRepository<Event>? _eventRepo;
-        public IRepository<Event> EventRepo
-        {
-            get
-            {
-                if (_eventRepo == null)
-                {
-                    _eventRepo = new Repository<Event>(_humanActivitiesDataContext.Events);
-                }
-                return _eventRepo;
             }
         }
 
@@ -113,16 +100,16 @@ namespace DAL.UnitOfWork
             }
         }
 
-        private IRepository<ToDoListTemplate>? _toDoListTemplateRepo;
-        public IRepository<ToDoListTemplate> TodoListTemplateRepo
+        private IRepository<ToDoList>? _toDoListRepo;
+        public IRepository<ToDoList> TodoListRepo
         {
             get
             {
-                if (_toDoListTemplateRepo == null)
+                if (_toDoListRepo == null)
                 {
-                    _toDoListTemplateRepo = new Repository<ToDoListTemplate>(_humanActivitiesDataContext.ToDoListTemplates);
+                    _toDoListRepo = new Repository<ToDoList>(_humanActivitiesDataContext.ToDoList);
                 }
-                return _toDoListTemplateRepo;
+                return _toDoListRepo;
             }
         }
 
@@ -136,19 +123,6 @@ namespace DAL.UnitOfWork
                     _userRepo = new Repository<User>(_humanActivitiesDataContext.Users);
                 }
                 return _userRepo;
-            }
-        }
-
-        private IRepository<UserCosts>? _userCostRepo;
-        public IRepository<UserCosts> UserCostRepo
-        {
-            get
-            {
-                if (_userCostRepo == null)
-                {
-                    _userCostRepo = new Repository<UserCosts>(_humanActivitiesDataContext.UserCosts);
-                }
-                return _userCostRepo;
             }
         }
 

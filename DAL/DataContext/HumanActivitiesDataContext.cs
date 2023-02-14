@@ -1,7 +1,6 @@
 ﻿using DAL.DataEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace DAL.DataContext
@@ -15,15 +14,14 @@ namespace DAL.DataContext
         { }
 
         public virtual DbSet<Activity> Activities { get; set; }
-        public virtual DbSet<Calendar> Calendars { get; set; }
+        public virtual DbSet<Bill> Bills { get; set; }
+        public virtual DbSet<BillItem> BillItems { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
-        public virtual DbSet<Cost> Costs { get; set; }
-        public virtual DbSet<Event> Events { get; set; }
+        public virtual DbSet<BillItem> Costs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<DataEntities.Task> Tasks { get; set; }
-        public virtual DbSet<ToDoListTemplate> ToDoListTemplates { get; set; }
+        public virtual DbSet<ToDoList> ToDoList { get; set; }
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<UserCosts> UserCosts { get; set; }
         public virtual DbSet<UserGroups> UserGroups { get; set; }
         public virtual DbSet<UserIdentity> UserIdentities { get; set; }
         public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
@@ -54,40 +52,22 @@ namespace DAL.DataContext
                     .HasConstraintName("FK_Activities_User_UserId");
             });
 
-            modelBuilder.Entity<Calendar>(entity =>
+            modelBuilder.Entity<Bill>(entity =>
             {
-                entity.Property(e => e.CalendarGuid)
+                entity.Property(e => e.BillGuid)
                 .HasValueGenerator<GuidValueGenerator>();
 
-                entity.HasOne(e => e.User)
-                    .WithMany(u => u.Calendars)
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Calendars_User_UserId");
+                entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("now()");
             });
 
-            modelBuilder.Entity<Category>(entity =>
+            modelBuilder.Entity<BillItem>(entity =>
             {
-                //entity.Property(e => e.CategoryGuid)
-                //.HasValueGenerator<GuidValueGenerator>();
-            });
-
-            modelBuilder.Entity<Cost>(entity =>
-            {
-                entity.Property(e => e.CostGuid)
-                .HasValueGenerator<GuidValueGenerator>();
-            });
-
-            modelBuilder.Entity<Event>(entity =>
-            {
-                entity.Property(e => e.EventGuid)
+                entity.Property(e => e.BillItemGuid)
                 .HasValueGenerator<GuidValueGenerator>();
 
-                entity.HasOne(e => e.Calendar)
-                    .WithMany(c => c.Events)
-                    .HasForeignKey(e => e.CalendarId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Category_Calendar_CalendarId");
+                entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("now()");
             });
 
             modelBuilder.Entity<Group>(entity =>
@@ -108,12 +88,12 @@ namespace DAL.DataContext
                 .HasValueGenerator<GuidValueGenerator>();
             });
 
-            modelBuilder.Entity<ToDoListTemplate>(entity =>
+            modelBuilder.Entity<ToDoList>(entity =>
             {
-                entity.Property(e => e.ToDoListTemplateGuid)
+                entity.Property(e => e.ToDoListGuid)
                 .HasValueGenerator<GuidValueGenerator>();
 
-                entity.Property(e => e.CreatedDateTime)
+                entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()");
             });
 

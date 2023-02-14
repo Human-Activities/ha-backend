@@ -25,7 +25,7 @@ public class ActivityService
         {
             Name = request.Name,
             Description = request.Description,
-            IsPrivate = request.IsPrivate
+            IsPublic = request.IsPrivate
         };
 
         await _uow.ActivityRepo.AddAsync(activity);
@@ -46,15 +46,14 @@ public class ActivityService
             ActivityGuid = activityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
-            IsPrivate = activity.IsPrivate,
-            IsTemplate = activity.IsTemplate,
+            IsPrivate = activity.IsPublic,
             Category = activity.Category
         };
     }
 
     public async Task<IEnumerable<GetActivityResult>> GetActivities(GetActivitiesRequest request, string userId)
     {
-        var activities =  await _uow.ActivityRepo.WhereAsync(a => a.IsPrivate == request.IsPrivate && a.User.UserGuid == Guid.Parse(userId));
+        var activities =  await _uow.ActivityRepo.WhereAsync(a => a.IsPublic == request.IsPrivate && a.User.UserGuid == Guid.Parse(userId));
 
         return activities.Select(a => a.ToGetActivitiesResult());
     }
@@ -71,8 +70,7 @@ public class ActivityService
 
         activity.Name = request.Name;
         activity.Description = request.Description;
-        activity.IsPrivate = request.IsPrivate;
-        activity.IsTemplate = request.IsTemplate;
+        activity.IsPublic = request.IsPrivate;
 
         _uow.ActivityRepo.Update(activity);
         await _uow.CompleteAsync();
@@ -103,12 +101,8 @@ public static class ActivityServiceExtensions
             ActivityGuid = activity.ActivityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
-            IsPrivate = activity.IsPrivate,
-            IsTemplate = activity.IsTemplate,
+            IsPrivate = activity.IsPublic,
             Category = activity.Category
         };
     }
 }
-
-
-

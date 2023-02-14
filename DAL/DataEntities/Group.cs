@@ -4,6 +4,8 @@
     {
         public Group()
         {
+            Bills = new HashSet<Bill>();
+            ToDoLists = new HashSet<ToDoList>();
             UserGroups = new HashSet<UserGroups>();
         }
 
@@ -15,6 +17,10 @@
 
         public string? Description { get; set; }
 
+
+        public virtual ICollection<Bill> Bills { get; set; }
+
+        public virtual ICollection<ToDoList> ToDoLists { get; set; }
 
         public virtual ICollection<UserGroups> UserGroups { get; set; }
     }

@@ -3,21 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.DataEntities
 {
-    public class ToDoListTemplate
+    public class ToDoList
     {
-        public ToDoListTemplate()
+        public ToDoList()
         {
             Sections = new HashSet<Section>();
         }
 
         public int Id { get; set; }
 
-        public Guid ToDoListTemplateGuid { get; set; }
+        public Guid ToDoListGuid { get; set; }
 
         [ForeignKey("User")]
         public int? UserId { get; set; }
 
-        public DateTime CreatedDateTime { get; set; }
+        public int? GroupId { get; set; }
+
+        public DateTime CreatedDate { get; set; }
 
         public string Name { get; set; }
 
@@ -29,6 +31,8 @@ namespace DAL.DataEntities
 
 
         public virtual User? User { get; set; }
+
+        public virtual Group? Group { get; set; }
 
         public virtual ICollection<Section>? Sections { get; set; }
     }

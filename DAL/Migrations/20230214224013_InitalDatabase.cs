@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialdatabase : Migration
+    public partial class InitalDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,22 +25,6 @@ namespace DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Costs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CostGuid = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Value = table.Column<double>(type: "double precision", nullable: false),
-                    CostType = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Costs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,11 +87,11 @@ namespace DAL.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ActivityGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    IsTemplate = table.Column<bool>(type: "boolean", nullable: false),
-                    IsPrivate = table.Column<bool>(type: "boolean", nullable: false),
-                    CategoryId = table.Column<int>(type: "integer", nullable: false)
+                    IsPublic = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -126,34 +110,45 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Calendars",
+                name: "Bills",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CalendarGuid = table.Column<Guid>(type: "uuid", nullable: false),
+                    BillGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    GroupId = table.Column<int>(type: "integer", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    TotalValue = table.Column<double>(type: "double precision", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    AccountBillNumber = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Calendars", x => x.Id);
+                    table.PrimaryKey("PK_Bills", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Calendars_User_UserId",
+                        name: "FK_Bills_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Bills_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ToDoListTemplates",
+                name: "ToDoList",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ToDoListTemplateGuid = table.Column<Guid>(type: "uuid", nullable: false),
+                    ToDoListGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true),
-                    CreatedDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    GroupId = table.Column<int>(type: "integer", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     Name = table.Column<string>(type: "text", nullable: false),
                     ToDoListType = table.Column<int>(type: "integer", nullable: false),
                     IsFavourite = table.Column<bool>(type: "boolean", nullable: false),
@@ -161,38 +156,17 @@ namespace DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ToDoListTemplates", x => x.Id);
+                    table.PrimaryKey("PK_ToDoList", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ToDoListTemplates_Users_UserId",
+                        name: "FK_ToDoList_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ToDoList_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserCosts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    CostId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserCosts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserCosts_Costs_CostId",
-                        column: x => x.CostId,
-                        principalTable: "Costs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserCosts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,27 +234,33 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "BillItem",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    EventGuid = table.Column<Guid>(type: "uuid", nullable: false),
+                    BillItemGuid = table.Column<Guid>(type: "uuid", nullable: false),
+                    BillId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Day = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CalendarId = table.Column<int>(type: "integer", nullable: false)
+                    TotalValue = table.Column<double>(type: "double precision", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.PrimaryKey("PK_BillItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Category_Calendar_CalendarId",
-                        column: x => x.CalendarId,
-                        principalTable: "Calendars",
-                        principalColumn: "Id");
+                        name: "FK_BillItem_Bills_BillId",
+                        column: x => x.BillId,
+                        principalTable: "Bills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BillItem_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -291,17 +271,17 @@ namespace DAL.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SectionGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     ToDoListId = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    ToDoListTemplateId = table.Column<int>(type: "integer", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sections_ToDoListTemplates_ToDoListTemplateId",
-                        column: x => x.ToDoListTemplateId,
-                        principalTable: "ToDoListTemplates",
-                        principalColumn: "Id");
+                        name: "FK_Sections_ToDoList_ToDoListId",
+                        column: x => x.ToDoListId,
+                        principalTable: "ToDoList",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -339,19 +319,29 @@ namespace DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Calendars_UserId",
-                table: "Calendars",
+                name: "IX_BillItem_BillId",
+                table: "BillItem",
+                column: "BillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BillItem_UserId",
+                table: "BillItem",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_CalendarId",
-                table: "Events",
-                column: "CalendarId");
+                name: "IX_Bills_GroupId",
+                table: "Bills",
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sections_ToDoListTemplateId",
+                name: "IX_Bills_UserId",
+                table: "Bills",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sections_ToDoListId",
                 table: "Sections",
-                column: "ToDoListTemplateId");
+                column: "ToDoListId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tasks_SectionId",
@@ -359,18 +349,13 @@ namespace DAL.Migrations
                 column: "SectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ToDoListTemplates_UserId",
-                table: "ToDoListTemplates",
-                column: "UserId");
+                name: "IX_ToDoList_GroupId",
+                table: "ToDoList",
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserCosts_CostId",
-                table: "UserCosts",
-                column: "CostId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserCosts_UserId",
-                table: "UserCosts",
+                name: "IX_ToDoList_UserId",
+                table: "ToDoList",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -396,13 +381,10 @@ namespace DAL.Migrations
                 name: "Activities");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "BillItem");
 
             migrationBuilder.DropTable(
                 name: "Tasks");
-
-            migrationBuilder.DropTable(
-                name: "UserCosts");
 
             migrationBuilder.DropTable(
                 name: "UserGroups");
@@ -417,19 +399,16 @@ namespace DAL.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Calendars");
+                name: "Bills");
 
             migrationBuilder.DropTable(
                 name: "Sections");
 
             migrationBuilder.DropTable(
-                name: "Costs");
+                name: "ToDoList");
 
             migrationBuilder.DropTable(
                 name: "Groups");
-
-            migrationBuilder.DropTable(
-                name: "ToDoListTemplates");
 
             migrationBuilder.DropTable(
                 name: "Users");

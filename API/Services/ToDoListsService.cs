@@ -25,7 +25,7 @@ namespace API.Services
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList name can't be empty");
 
-            var toDoList = new ToDoListTemplate
+            var toDoList = new ToDoList
             {
                 Name = request.Name,
                 Description = request.Description,
@@ -45,7 +45,7 @@ namespace API.Services
                 }).ToList()
             };
 
-            await _uow.TodoListTemplateRepo.AddAsync(toDoList);
+            await _uow.TodoListRepo.AddAsync(toDoList);
             await _uow.CompleteAsync();
 
             return new CreateToDoListResult("ToDoList has been created succesfully!");
@@ -56,14 +56,14 @@ namespace API.Services
             if (!Guid.TryParse(toDoListGuidAsString, out Guid toDoListGuid))
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList guid is incorrect");
 
-            var toDoList = await _uow.TodoListTemplateRepo.SingleOrDefaultAsync(t => t.ToDoListTemplateGuid == toDoListGuid);
+            var toDoList = await _uow.TodoListRepo.SingleOrDefaultAsync(t => t.ToDoListGuid == toDoListGuid);
 
             if (toDoList == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no ToDoList like this");
 
             return new GetToDoListResult
             {
-                ToDoListGuid = toDoList.ToDoListTemplateGuid.ToString(),
+                ToDoListGuid = toDoList.ToDoListGuid.ToString(),
                 Name = toDoList.Name,
                 Description = toDoList.Description,
                 IsFavourite = toDoList.IsFavourite,
@@ -78,12 +78,12 @@ namespace API.Services
 
             if (groupGuid.IsNullOrEmpty())
             {
-                toDoLists = (await _uow.TodoListTemplateRepo.WhereAsync(td => td.UserId == userId)).Select(td => td.ToGetToDoListResult()).ToList();
+                toDoLists = (await _uow.TodoListRepo.WhereAsync(td => td.UserId == userId)).Select(td => td.ToGetToDoListResult()).ToList();
             }
             else
             {
                 if (Guid.TryParse(groupGuid, out Guid toDoListGuidParsed))
-                    toDoLists = (await _uow.TodoListTemplateRepo.WhereAsync(td => td.ToDoListTemplateGuid == toDoListGuidParsed)).Select(td => td.ToGetToDoListResult()).ToList();
+                    toDoLists = (await _uow.TodoListRepo.WhereAsync(td => td.ToDoListGuid == toDoListGuidParsed)).Select(td => td.ToGetToDoListResult()).ToList();
                 else
                     throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
             }
@@ -97,7 +97,7 @@ namespace API.Services
 
             if (groupGuid.IsNullOrEmpty())
             {
-                toDoLists = (await _uow.TodoListTemplateRepo
+                toDoLists = (await _uow.TodoListRepo
                     .WhereAsync(td => td.UserId == userId 
                     && (td.ToDoListType == ToDoListType.Template || td.ToDoListType == ToDoListType.Base)))
                     .Select(td => td.ToGetToDoListResult()).ToList();
@@ -105,7 +105,7 @@ namespace API.Services
             else
             {
                 if (Guid.TryParse(groupGuid, out Guid toDoListGuidParsed))
-                    toDoLists = (await _uow.TodoListTemplateRepo.WhereAsync(td => td.ToDoListTemplateGuid == toDoListGuidParsed)).Select(td => td.ToGetToDoListResult()).ToList();
+                    toDoLists = (await _uow.TodoListRepo.WhereAsync(td => td.ToDoListGuid == toDoListGuidParsed)).Select(td => td.ToGetToDoListResult()).ToList();
                 else
                     throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
             }
@@ -123,7 +123,7 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList guid is incorrect");
             }
 
-            var toDoList = await _uow.TodoListTemplateRepo.SingleOrDefaultAsync(g => g.ToDoListTemplateGuid == toDoListGuid);
+            var toDoList = await _uow.TodoListRepo.SingleOrDefaultAsync(g => g.ToDoListGuid == toDoListGuid);
 
             if (toDoList == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no ToDoList like this");
@@ -172,7 +172,7 @@ namespace API.Services
                 }
             }
 
-            _uow.TodoListTemplateRepo.Update(toDoList);
+            _uow.TodoListRepo.Update(toDoList);
             await _uow.CompleteAsync();
 
             return new EditToDoListResult("ToDoList has been edited successfully!");
@@ -185,7 +185,7 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList guid is incorrect");
             }
 
-            var toDoList = await _uow.TodoListTemplateRepo.SingleOrDefaultAsync(g => g.ToDoListTemplateGuid == toDoListGuid);
+            var toDoList = await _uow.TodoListRepo.SingleOrDefaultAsync(g => g.ToDoListGuid == toDoListGuid);
 
             if (toDoList == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no ToDoList like this");
@@ -204,7 +204,7 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList guid is incorrect");
             }
 
-            var toDoList = await _uow.TodoListTemplateRepo.SingleOrDefaultAsync(g => g.ToDoListTemplateGuid == toDoListGuid);
+            var toDoList = await _uow.TodoListRepo.SingleOrDefaultAsync(g => g.ToDoListGuid == toDoListGuid);
 
             if (toDoList == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no ToDoList like this");
@@ -223,12 +223,12 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList guid is incorrect");
             }
 
-            var toDoList = await _uow.TodoListTemplateRepo.SingleOrDefaultAsync(t => t.ToDoListTemplateGuid == toDoListGuid);
+            var toDoList = await _uow.TodoListRepo.SingleOrDefaultAsync(t => t.ToDoListGuid == toDoListGuid);
 
             if (toDoList == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no ToDoList like this");
 
-            _uow.TodoListTemplateRepo.Remove(toDoList);
+            _uow.TodoListRepo.Remove(toDoList);
             await _uow.CompleteAsync();
 
             return new DeleteToDoListResult("ToDoList has been deleted successfully!");
@@ -238,11 +238,11 @@ namespace API.Services
 
 public static class ToDoListsServiceExtensions
 {
-    public static GetToDoListResult ToGetToDoListResult(this ToDoListTemplate toDoList)
+    public static GetToDoListResult ToGetToDoListResult(this ToDoList toDoList)
     {
         return new GetToDoListResult
         {
-            ToDoListGuid = toDoList.ToDoListTemplateGuid.ToString(),
+            ToDoListGuid = toDoList.ToDoListGuid.ToString(),
             ToDoListType = toDoList.ToDoListType,
             Description = toDoList.Description,
             IsFavourite = toDoList.IsFavourite,
