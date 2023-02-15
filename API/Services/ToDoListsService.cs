@@ -98,8 +98,8 @@ namespace API.Services
             if (groupGuid.IsNullOrEmpty())
             {
                 toDoLists = (await _uow.TodoListRepo
-                    .WhereAsync(td => td.UserId == userId 
-                    && (td.ToDoListType == ToDoListType.Template || td.ToDoListType == ToDoListType.Base)))
+                    .WhereAsync(td => td.ToDoListType == ToDoListType.Base
+                    || (td.ToDoListType == ToDoListType.Template && td.UserId == userId)))
                     .Select(td => td.ToGetToDoListResult()).ToList();
             }
             else
