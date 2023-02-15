@@ -11,6 +11,8 @@ namespace DAL.DataEntities
         [ForeignKey("User")]
         public int UserId { get; set; }
 
+        public int? GroupId { get; set; }
+
         public int CategoryId { get; set; }
 
         public string Name { get; set; }
@@ -23,6 +25,8 @@ namespace DAL.DataEntities
 
 
         public virtual User User { get; set; }
+
+        public virtual Group? Group { get; set; } 
 
         public virtual Category Category { get; set; }
     }

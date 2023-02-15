@@ -1,9 +1,6 @@
 ﻿namespace API.Models.Activities
 {
-    public class EditActivityResult : CreateActivityResult
+    public class EditActivityResult : GetActivityResult
     {
-        public EditActivityResult(string message) : base(message)
-        {
-        }
     }
 }

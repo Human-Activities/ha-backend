@@ -5,7 +5,7 @@ namespace API.Models.ToDoLists
 {
     public class CreateToDoListResult : CreateActivityResult
     {
-        public CreateToDoListResult(string message) : base(message)
+        public CreateToDoListResult(string message)
         {
         }
     }

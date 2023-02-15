@@ -4,7 +4,7 @@ namespace API.Models.Groups
 {
     public class CreateGroupResult : CreateActivityResult
     {
-        public CreateGroupResult(string message) : base(message)
+        public CreateGroupResult(string message)
         {
         }
     }

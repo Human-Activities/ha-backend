@@ -5,6 +5,7 @@ using API.Models.Bills;
 using Microsoft.IdentityModel.Tokens;
 using DAL.DataEntities;
 using API.Models.Categories;
+using API.Models;
 
 namespace API.Services
 {

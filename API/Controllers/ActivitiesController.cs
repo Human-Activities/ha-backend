@@ -22,8 +22,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(CreateActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateActivity(CreateActivityRequest request)
         {
-            var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
-            var result = await _activityService.CreateActivity(request, userId);
+            var result = await _activityService.CreateActivity(request);
 
             return Ok(result);
         }
@@ -41,8 +40,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(IEnumerable<GetActivityResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvities(GetActivitiesRequest request)
         {
-            string userId = HttpContext.User.FindFirstValue("id");
-            var result = await _activityService.GetActivities(request, userId);
+            var result = await _activityService.GetActivities(request);
 
             return Ok(result);
         }
@@ -57,12 +55,12 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{activityGuid}")]
-        [ProducesResponseType(typeof(DeleteActivityResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteActivity(string activityGuid)
         {
-            var result = await _activityService.DeleteActivity(activityGuid);
+            await _activityService.DeleteActivity(activityGuid);
 
-            return Ok(result);
+            return Ok();
         }
     }
 }

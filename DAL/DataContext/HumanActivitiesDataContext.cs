@@ -45,6 +45,9 @@ namespace DAL.DataContext
                 entity.Property(e => e.ActivityGuid)
                 .HasValueGenerator<GuidValueGenerator>();
 
+                entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("now()");
+
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.Activities)
                     .HasForeignKey(e => e.UserId)

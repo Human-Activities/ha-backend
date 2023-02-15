@@ -1,5 +1,7 @@
 ﻿using API.Exceptions;
+using API.Models;
 using API.Models.Activities;
+using API.Models.Categories;
 using DAL;
 using DAL.DataEntities;
 using DAL.UnitOfWork;
@@ -16,45 +18,80 @@ public class ActivityService
         _uow = DataAccessLayerFactory.CreateUnitOfWork();
     }
 
-    public async Task<CreateActivityResult> CreateActivity(CreateActivityRequest request, int userId)
+    public async Task<CreateActivityResult> CreateActivity(CreateActivityRequest request)
     {
         if (request.Name.IsNullOrEmpty())
             throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
 
+        User? user = null;
+        Group? group = null;
+
+        if (Guid.TryParse(request.UserGuid, out Guid userGuid))
+            user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
+
+        if (user == null)
+            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. UserGuid is incorrect");
+
+        if (Guid.TryParse(request.GroupGuid, out Guid groupGuid))
+            group = await _uow.GroupRepo.SingleOrDefaultAsync(u => u.GroupGuid == groupGuid);
+
+        if (!request.GroupGuid.IsNullOrEmpty() && group == null)
+            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. GroupGuid is incorrect");
+
         var activity = new Activity
         {
-            UserId = userId,
+            UserId = user.Id,
+            GroupId = group?.Id,
             Name = request.Name,
             Description = request.Description,
-            IsPublic = request.IsPublic
+            IsPublic = request.IsPublic,
+            CategoryId = request.Category.Id
         };
 
-        await _uow.ActivityRepo.AddAsync(activity);
-        await _uow.CompleteAsync();
+        try
+        {
+            await _uow.ActivityRepo.AddAsync(activity);
+            await _uow.CompleteAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+        }
 
-        return new CreateActivityResult("Activity has been created succesfully!");
+        return (CreateActivityResult)activity.ToGetActivitiesResult();
     }
 
-    public async Task<GetActivityResult> GetActivity (string activityGuid)
+    public async Task<GetActivityResult> GetActivity(string activityGuid)
     {
         var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == Guid.Parse(activityGuid));
 
         if (activity == null)
             throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
 
-        return new GetActivityResult
-        {
-            ActivityGuid = activityGuid.ToString(),
-            Name = activity.Name,
-            Description = activity.Description,
-            IsPublic = activity.IsPublic,
-            Category = activity.Category
-        };
+        return activity.ToGetActivitiesResult();
     }
 
-    public async Task<IEnumerable<GetActivityResult>> GetActivities(GetActivitiesRequest request, string userId)
+    public async Task<IEnumerable<GetActivityResult>> GetActivities(GetActivitiesRequest request)
     {
-        var activities =  await _uow.ActivityRepo.WhereAsync(a => a.IsPublic == request.IsPrivate && a.User.UserGuid == Guid.Parse(userId));
+        User? user = null;
+        Group? group = null;
+        IEnumerable<Activity> activities;
+
+        if (Guid.TryParse(request.UserGuid, out Guid userGuid))
+            user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
+
+        if (user == null)
+            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. UserGuid is incorrect");
+        else
+            activities = await _uow.ActivityRepo.WhereAsync(a => a.IsPublic == request.IsPrivate && a.User.UserGuid == userGuid);
+
+        if (Guid.TryParse(request.GroupGuid, out Guid groupGuid))
+            group = await _uow.GroupRepo.SingleOrDefaultAsync(u => u.GroupGuid == groupGuid);
+
+        if (!request.GroupGuid.IsNullOrEmpty() && group == null)
+            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. GroupGuid is incorrect");
+        else
+            activities = await _uow.ActivityRepo.WhereAsync(a => a.IsPublic == request.IsPrivate && a.Group.GroupGuid == groupGuid);
 
         return activities.Select(a => a.ToGetActivitiesResult());
     }
@@ -64,7 +101,10 @@ public class ActivityService
         if (request.Name.IsNullOrEmpty())
             throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
 
-        var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == Guid.Parse(request.ActivityGuid));
+        if (!Guid.TryParse(request.ActivityGuid, out Guid activityGuid))
+            throw new OperationException(StatusCodes.Status400BadRequest, "ActivityGuid is incorrect");
+
+        var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == activityGuid);
 
         if (activity == null)
             throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
@@ -72,24 +112,37 @@ public class ActivityService
         activity.Name = request.Name;
         activity.Description = request.Description;
         activity.IsPublic = request.IsPublic;
+        activity.CategoryId = request.Category.Id;
 
-        _uow.ActivityRepo.Update(activity);
-        await _uow.CompleteAsync();
+        try
+        {
+            _uow.ActivityRepo.Update(activity);
+            await _uow.CompleteAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+        }
 
-        return new EditActivityResult("Activity has been edited successfully!");
+        return (EditActivityResult)activity.ToGetActivitiesResult();
     }
 
-    public async Task<DeleteActivityResult> DeleteActivity (string activityGuid)
+    public async System.Threading.Tasks.Task DeleteActivity(string activityGuid)
     {
         var activity = await _uow.ActivityRepo.SingleOrDefaultAsync(a => a.ActivityGuid == Guid.Parse(activityGuid));
 
         if (activity == null)
             throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no activity like this");
 
-        _uow.ActivityRepo.Remove(activity);
-        await _uow.CompleteAsync();
-
-        return new DeleteActivityResult("Activity has been deleted successfully!");
+        try
+        {
+            _uow.ActivityRepo.Remove(activity);
+            await _uow.CompleteAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+        }
     }
 }
 
@@ -100,10 +153,22 @@ public static class ActivityServiceExtensions
         return new GetActivityResult
         {
             ActivityGuid = activity.ActivityGuid.ToString(),
+            UserGuid = activity.User.UserGuid.ToString(),
+            GroupGuid = activity.Group?.GroupGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
             IsPublic = activity.IsPublic,
-            Category = activity.Category
+            Category = new ActivityCategory
+            {
+                Id = activity.Category.Id,
+                Name = activity.Category.Name,
+                RankPoints = activity.Category.Value ?? 0
+            },
+            Author = new Author
+            {
+                AuthorGuid = activity.User.UserGuid.ToString(),
+                Name = activity.User.Login
+            }
         };
     }
 }
