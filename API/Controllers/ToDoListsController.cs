@@ -35,9 +35,9 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get-all/{groupGuid}")]
+        [HttpGet("get-all/{groupGuid?}")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetToDoLists(string? groupGuid) // jesli ToDoListId null to wez po userid
+        public async Task<IActionResult> GetToDoLists(string? groupGuid = null) // jesli ToDoListId null to wez po userid
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _toDoListService.GetToDoLists(userId, groupGuid);
@@ -45,9 +45,9 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get-templates/{groupGuid}")]
+        [HttpGet("get-templates/{groupGuid?}")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetToDoListTemplates(string? groupGuid)
+        public async Task<IActionResult> GetToDoListTemplates(string? groupGuid = null)
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _toDoListService.GetToDoListTemplates(userId, groupGuid);
