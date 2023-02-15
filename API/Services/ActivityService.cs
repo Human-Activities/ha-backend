@@ -16,16 +16,17 @@ public class ActivityService
         _uow = DataAccessLayerFactory.CreateUnitOfWork();
     }
 
-    public async Task<CreateActivityResult> CreateActivity(CreateActivityRequest request)
+    public async Task<CreateActivityResult> CreateActivity(CreateActivityRequest request, int userId)
     {
         if (request.Name.IsNullOrEmpty())
             throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
 
         var activity = new Activity
         {
+            UserId = userId,
             Name = request.Name,
             Description = request.Description,
-            IsPublic = request.IsPrivate
+            IsPublic = request.IsPublic
         };
 
         await _uow.ActivityRepo.AddAsync(activity);
@@ -46,7 +47,7 @@ public class ActivityService
             ActivityGuid = activityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
-            IsPrivate = activity.IsPublic,
+            IsPublic = activity.IsPublic,
             Category = activity.Category
         };
     }
@@ -70,7 +71,7 @@ public class ActivityService
 
         activity.Name = request.Name;
         activity.Description = request.Description;
-        activity.IsPublic = request.IsPrivate;
+        activity.IsPublic = request.IsPublic;
 
         _uow.ActivityRepo.Update(activity);
         await _uow.CompleteAsync();
@@ -101,7 +102,7 @@ public static class ActivityServiceExtensions
             ActivityGuid = activity.ActivityGuid.ToString(),
             Name = activity.Name,
             Description = activity.Description,
-            IsPrivate = activity.IsPublic,
+            IsPublic = activity.IsPublic,
             Category = activity.Category
         };
     }

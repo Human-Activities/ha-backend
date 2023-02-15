@@ -72,7 +72,7 @@ namespace API.Services
             };
         }
 
-        public async Task<IEnumerable<GetToDoListResult>> GetToDoLists(int userId, string groupGuid)
+        public async Task<IEnumerable<GetToDoListResult>> GetToDoLists(int userId, string? groupGuid)
         {
             var toDoLists = new List<GetToDoListResult>();
 
@@ -91,15 +91,15 @@ namespace API.Services
             return toDoLists;
         }
 
-        public async Task<IEnumerable<GetToDoListResult>> GetToDoListTemplates(int userId, string groupGuid)
+        public async Task<IEnumerable<GetToDoListResult>> GetToDoListTemplates(int userId, string? groupGuid)
         {
             var toDoLists = new List<GetToDoListResult>();
 
             if (groupGuid.IsNullOrEmpty())
             {
                 toDoLists = (await _uow.TodoListRepo
-                    .WhereAsync(td => td.UserId == userId 
-                    && (td.ToDoListType == ToDoListType.Template || td.ToDoListType == ToDoListType.Base)))
+                    .WhereAsync(td => td.ToDoListType == ToDoListType.Base
+                    || (td.ToDoListType == ToDoListType.Template && td.UserId == userId)))
                     .Select(td => td.ToGetToDoListResult()).ToList();
             }
             else

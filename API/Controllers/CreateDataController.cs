@@ -164,7 +164,7 @@ namespace API.Controllers
                 new ToDoList
                 {
                     Name = "Week",
-                    ToDoListType = DAL.CommonVariables.ToDoListType.Template,
+                    ToDoListType = DAL.CommonVariables.ToDoListType.Base,
                     IsFavourite = true,
                     Description = "Is template todolist with all days",
                     Sections = new List<Section>
@@ -202,7 +202,7 @@ namespace API.Controllers
                 new ToDoList
                 {
                     Name = "Shopping",
-                    ToDoListType = DAL.CommonVariables.ToDoListType.Template,
+                    ToDoListType = DAL.CommonVariables.ToDoListType.Base,
                     IsFavourite = true,
                     Description = "Is template todolist for shopping",
                     Sections = new List<Section>
@@ -228,7 +228,7 @@ namespace API.Controllers
                 new ToDoList
                 {
                     Name = "Trip",
-                    ToDoListType = DAL.CommonVariables.ToDoListType.Template,
+                    ToDoListType = DAL.CommonVariables.ToDoListType.Base,
                     IsFavourite = true,
                     Description = "Is template todolist for trips",
                     Sections = new List<Section>
@@ -254,7 +254,7 @@ namespace API.Controllers
                 new ToDoList
                 {
                     Name = "Party",
-                    ToDoListType = DAL.CommonVariables.ToDoListType.Template,
+                    ToDoListType = DAL.CommonVariables.ToDoListType.Base,
                     IsFavourite = true,
                     Description = "Is template todolist for parties",
                     Sections = new List<Section>
@@ -276,7 +276,7 @@ namespace API.Controllers
                 new ToDoList
                 {
                     Name = "Language learning",
-                    ToDoListType = DAL.CommonVariables.ToDoListType.Template,
+                    ToDoListType = DAL.CommonVariables.ToDoListType.Base,
                     IsFavourite = true,
                     Description = "Is template todolist for languege learning",
                     Sections = new List<Section>
@@ -294,7 +294,7 @@ namespace API.Controllers
                 new ToDoList
                 {
                     Name = "Exercies",
-                    ToDoListType = DAL.CommonVariables.ToDoListType.Template,
+                    ToDoListType = DAL.CommonVariables.ToDoListType.Base,
                     IsFavourite = true,
                     Description = "Is template todolist for exercises",
                     Sections = new List<Section>
@@ -316,6 +316,35 @@ namespace API.Controllers
             };
 
                 await _uow.TodoListRepo.AddRangeAsync(todoLists);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("create-roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateRoles()
+        {
+            try
+            {
+                var roles = new List<UserRole>
+                {
+                    new UserRole{
+                        Id = 1,
+                        Name = "admin"
+                    },
+                    new UserRole{
+                        Id = 2,
+                        Name = "loggedUser"
+                    }
+                };
+
+                await _uow.UserRoleRepo.AddRangeAsync(roles);
                 await _uow.CompleteAsync();
             }
             catch (Exception ex)

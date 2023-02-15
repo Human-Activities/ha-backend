@@ -64,13 +64,19 @@ namespace API.Services
                 RoleId = 2
             };
 
-            await _uow.UserRepo.AddAsync(newUser);
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.UserRepo.AddAsync(newUser);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            { }
 
             var createdUser = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == request.Login);
 
             UserIdentity createdUserIdentity = new UserIdentity()
             {
+                UserId = createdUser.Id,
                 UserGuid = createdUser.UserGuid,
                 Salt = salt
             };
@@ -102,7 +108,7 @@ namespace API.Services
             return await _authenticator.Authenticate(user, _uow);
         }
 
-        public async Task<RefreshResult> Refresh (RefreshRequest request, int userId)
+        public async Task<RefreshResult> Refresh(RefreshRequest request, int userId)
         {
             if (request == null)
                 throw new OperationException(StatusCodes.Status400BadRequest, "Invalid client request.");
