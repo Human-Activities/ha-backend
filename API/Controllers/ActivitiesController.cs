@@ -22,7 +22,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(CreateActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateActivity(CreateActivityRequest request)
         {
-            var result = await _activityService.CreateActivity(request);
+            var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
+            var result = await _activityService.CreateActivity(request, userId);
 
             return Ok(result);
         }

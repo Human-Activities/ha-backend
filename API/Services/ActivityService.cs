@@ -16,13 +16,14 @@ public class ActivityService
         _uow = DataAccessLayerFactory.CreateUnitOfWork();
     }
 
-    public async Task<CreateActivityResult> CreateActivity(CreateActivityRequest request)
+    public async Task<CreateActivityResult> CreateActivity(CreateActivityRequest request, int userId)
     {
         if (request.Name.IsNullOrEmpty())
             throw new OperationException(StatusCodes.Status400BadRequest, "Activity name can't be empty");
 
         var activity = new Activity
         {
+            UserId = userId,
             Name = request.Name,
             Description = request.Description,
             IsPublic = request.IsPublic
