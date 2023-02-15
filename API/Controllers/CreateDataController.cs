@@ -325,5 +325,34 @@ namespace API.Controllers
 
             return Ok();
         }
+
+        [HttpPost("create-roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateRoles()
+        {
+            try
+            {
+                var roles = new List<UserRole>
+                {
+                    new UserRole{
+                        Id = 1,
+                        Name = "admin"
+                    },
+                    new UserRole{
+                        Id = 2,
+                        Name = "loggedUser"
+                    }
+                };
+
+                await _uow.UserRoleRepo.AddRangeAsync(roles);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return Ok();
+        }
     }
 }
