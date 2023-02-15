@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Route("api/TodoLists")]
+    [Route("api/todolists")]
     [ApiController]
     public class ToDoListsController : Controller
     {
