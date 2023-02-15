@@ -36,7 +36,8 @@ namespace API.Authenticators
                 userRefreshToken = new UserRefreshToken
                 {
                     Token = refreshToken,
-                    UserGuid = user.UserGuid
+                    UserGuid = user.UserGuid,
+                    UserId = user.Id
                 };
                 await unitOfWork.UserRefreshTokenRepo.AddAsync(userRefreshToken);
             }
