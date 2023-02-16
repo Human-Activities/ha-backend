@@ -2,6 +2,6 @@
 {
     public class EditTaskRequest : CreateTaskRequest
     {
-        public string TaskGuid { get; set; }
+        public string? TaskGuid { get; set; }
     }
 }

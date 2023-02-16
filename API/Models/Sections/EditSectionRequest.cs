@@ -4,7 +4,7 @@ namespace API.Models.Sections
 {
     public class EditSectionRequest
     {
-        public string SectionGuid { get; set; }
+        public string? SectionGuid { get; set; }
 
         public string Name { get; set; }
 
