@@ -30,16 +30,28 @@ namespace API.Services
                 Description = request.Description
             };
 
-            await _uow.GroupRepo.AddAsync(group);
-            await _uow.CompleteAsync();
-
-            await _uow.UserGroupRepo.AddAsync(new UserGroups
+            try
             {
-                User = await _uow.UserRepo.FindAsync(userId),
-                Group = group
-            });
-
-            await _uow.CompleteAsync();
+                await _uow.GroupRepo.AddAsync(group);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+            try
+            {
+                await _uow.UserGroupRepo.AddAsync(new UserGroups
+                {
+                    UserId = userId,
+                    GroupId = group.Id
+                });
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new CreateGroupResult("Group has been created succesfully!");
         }
