@@ -2,13 +2,7 @@
 
 namespace API.Models.Activities
 {
-    public class CreateActivityResult
+    public class CreateActivityResult : GetActivityResult
     {
-        public string Message { get; set; }
-
-        public CreateActivityResult(string message)
-        {
-            Message = message;
-        }
     }
 }

@@ -8,6 +8,8 @@ namespace API.Extensions
         {
             services.AddScoped<ActivityService>();
             services.AddScoped<AuthenticationService>();
+            services.AddScoped<BillService>();
+            services.AddScoped<CategoryService>();
             services.AddScoped<GroupService>();
             services.AddScoped<ToDoListsService>();
 

@@ -4,7 +4,7 @@ namespace API.Models.Bills
 {
     public class DeleteBillResult : CreateActivityResult
     {
-        public DeleteBillResult(string message) : base(message)
+        public DeleteBillResult(string message)
         {
         }
     }

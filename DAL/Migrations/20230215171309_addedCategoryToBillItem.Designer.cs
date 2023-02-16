@@ -3,6 +3,7 @@ using System;
 using DAL.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(HumanActivitiesDataContext))]
-    partial class HumanActivitiesDataContextModelSnapshot : ModelSnapshot
+    [Migration("20230215171309_addedCategoryToBillItem")]
+    partial class addedCategoryToBillItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,15 +40,10 @@ namespace DAL.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
@@ -60,8 +58,6 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("GroupId");
 
                     b.HasIndex("UserId");
 
@@ -421,10 +417,6 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.DataEntities.Group", "Group")
-                        .WithMany("Activities")
-                        .HasForeignKey("GroupId");
-
                     b.HasOne("DAL.DataEntities.User", "User")
                         .WithMany("Activities")
                         .HasForeignKey("UserId")
@@ -432,8 +424,6 @@ namespace DAL.Migrations
                         .HasConstraintName("FK_Activities_User_UserId");
 
                     b.Navigation("Category");
-
-                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -576,8 +566,6 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.DataEntities.Group", b =>
                 {
-                    b.Navigation("Activities");
-
                     b.Navigation("Bills");
 
                     b.Navigation("ToDoLists");
