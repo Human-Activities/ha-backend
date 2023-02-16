@@ -65,5 +65,7 @@ namespace API.Controllers
         }
 
         // jakis endpoint, get wszystkie billitemy, zeby moc zrobic podsumowanie
+        // podsumwoanie dla grupy, podsumowanie jednego usera, podsuwowanie w obliczu grupy
+        // podsumowanie dla user, w ramach tylko siebie, w ramach poszczegolnych grup
     }
 }

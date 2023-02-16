@@ -1,9 +1,6 @@
 ﻿using API.Models.Activities;
 using API.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
