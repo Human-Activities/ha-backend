@@ -379,7 +379,7 @@ public static class ToDoListsServiceExtensions
         };
     }
 
-    public static GetSectionResult ToGetSectionResult(this DAL.DataEntities.Section section)
+    public static GetSectionResult ToGetSectionResult(this Section section)
     {
         return new GetSectionResult
         {
