@@ -33,11 +33,11 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get")]
+        [HttpGet("get/{userGuid}.{groupGuid?}")]
         [ProducesResponseType(typeof(IEnumerable<GetActivityResult>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetActvities(GetActivitiesRequest request)
+        public async Task<IActionResult> GetActvities(string userGuid, string? groupGuid = null)
         {
-            var result = await _activityService.GetActivities(request);
+            var result = await _activityService.GetActivities(userGuid, groupGuid);
 
             return Ok(result);
         }

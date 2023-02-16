@@ -71,27 +71,35 @@ public class ActivityService
         return activity.ToGetActivitiesResult();
     }
 
-    public async Task<IEnumerable<GetActivityResult>> GetActivities(GetActivitiesRequest request)
+    public async Task<IEnumerable<GetActivityResult>> GetActivities(string userGuidAsString, string? groupGuidAsString = null)
     {
         User? user = null;
         Group? group = null;
         IEnumerable<Activity> activities;
 
-        if (Guid.TryParse(request.UserGuid, out Guid userGuid))
-            user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
+        if (groupGuidAsString.IsNullOrEmpty())
+        {
+            if (userGuidAsString.IsNullOrEmpty())
+                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. UserGuid and GroupGuid cannot be both empty");
 
-        if (user == null)
-            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. UserGuid is incorrect");
+            if (Guid.TryParse(userGuidAsString, out Guid userGuid))
+                user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
+
+            if (user == null)
+                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. UserGuid is incorrect");
+            else
+                activities = await _uow.ActivityRepo.WhereAsync(a => a.User.UserGuid == userGuid);
+        }
         else
-            activities = await _uow.ActivityRepo.WhereAsync(a => a.IsPublic == request.IsPrivate && a.User.UserGuid == userGuid);
+        {
+            if (Guid.TryParse(groupGuidAsString, out Guid groupGuid))
+                group = await _uow.GroupRepo.SingleOrDefaultAsync(u => u.GroupGuid == groupGuid);
 
-        if (Guid.TryParse(request.GroupGuid, out Guid groupGuid))
-            group = await _uow.GroupRepo.SingleOrDefaultAsync(u => u.GroupGuid == groupGuid);
-
-        if (!request.GroupGuid.IsNullOrEmpty() && group == null)
-            throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. GroupGuid is incorrect");
-        else
-            activities = await _uow.ActivityRepo.WhereAsync(a => a.IsPublic == request.IsPrivate && a.Group.GroupGuid == groupGuid);
+            if (!userGuidAsString.IsNullOrEmpty() && group == null)
+                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. GroupGuid is incorrect");
+            else
+                activities = await _uow.ActivityRepo.WhereAsync(a => a.Group.GroupGuid == groupGuid);
+        }
 
         return activities.Select(a => a.ToGetActivitiesResult());
     }
