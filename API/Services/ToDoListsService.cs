@@ -20,7 +20,7 @@ namespace API.Services
             _uow = DataAccessLayerFactory.CreateUnitOfWork();
         }
 
-        public async Task<CreateToDoListResult> CreateToDoList(CreateToDoListRequest request, int userId)
+        public async Task<GetToDoListResult> CreateToDoList(CreateToDoListRequest request, int userId)
         {
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList name can't be empty");
@@ -48,7 +48,7 @@ namespace API.Services
             await _uow.TodoListRepo.AddAsync(toDoList);
             await _uow.CompleteAsync();
 
-            return new CreateToDoListResult("ToDoList has been created succesfully!");
+            return toDoList.ToGetToDoListResult();
         }
 
         public async Task<GetToDoListResult> GetToDoList(string toDoListGuidAsString)
@@ -113,7 +113,7 @@ namespace API.Services
             return toDoLists;
         }
 
-        public async Task<EditToDoListResult> EditToDoList(EditToDoListRequest request)
+        public async Task<GetToDoListResult> EditToDoList(EditToDoListRequest request)
         {
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList name can't be empty");
@@ -175,7 +175,7 @@ namespace API.Services
             _uow.TodoListRepo.Update(toDoList);
             await _uow.CompleteAsync();
 
-            return new EditToDoListResult("ToDoList has been edited successfully!");
+            return toDoList.ToGetToDoListResult();
         }
 
         public async Task<SetFavouriteResult> SetFavourite(SetFavouriteRequest request)

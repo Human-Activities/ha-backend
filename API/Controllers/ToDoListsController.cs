@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
-        [ProducesResponseType(typeof(CreateToDoListResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateToDoList(CreateToDoListRequest request)
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
@@ -56,7 +56,7 @@ namespace API.Controllers
         }
 
         [HttpPut("edit")]
-        [ProducesResponseType(typeof(EditToDoListResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditToDoList(EditToDoListRequest request)
         {
             var result = await _toDoListService.EditToDoList(request);
