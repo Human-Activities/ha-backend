@@ -45,8 +45,15 @@ namespace API.Services
                 }).ToList()
             };
 
-            await _uow.TodoListRepo.AddAsync(toDoList);
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.TodoListRepo.AddAsync(toDoList);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return toDoList.ToGetToDoListResult();
         }
@@ -118,7 +125,7 @@ namespace API.Services
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList name can't be empty");
 
-            if(!Guid.TryParse(request.ToDoListGuid, out Guid toDoListGuid))
+            if (!Guid.TryParse(request.ToDoListGuid, out Guid toDoListGuid))
             {
                 throw new OperationException(StatusCodes.Status400BadRequest, "ToDoList guid is incorrect");
             }
@@ -135,45 +142,102 @@ namespace API.Services
 
             if (request.Sections != null)
             {
-                foreach (var updatedSection in request.Sections)
+                if (toDoList.Sections != null && toDoList.Sections.Any())
                 {
-                    if (!Guid.TryParse(updatedSection.SectionGuid, out Guid sectionGuid))
+                    foreach (var section in toDoList.Sections)
                     {
-                        throw new OperationException(StatusCodes.Status400BadRequest, "Section guid is incorrect");
-                    }
+                        var updatedSection = request.Sections.SingleOrDefault(s => s.SectionGuid == section.SectionGuid.ToString());
 
-                    var section = await _uow.SectionRepo.SingleOrDefaultAsync(s => s.SectionGuid == sectionGuid);
-
-                    if (section == null)
-                        throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no section like this");
-
-                    section.Name = updatedSection.Name;
-
-                    if (updatedSection.Tasks != null)
-                    {
-                        foreach (var updatedTask in updatedSection.Tasks)
+                        if (updatedSection == null)
+                            toDoList.Sections.Remove(section);
+                        else
                         {
-                            if (!Guid.TryParse(updatedTask.TaskGuid, out Guid taskGuid))
+                            section.Name = section.Name;
+
+                            if (updatedSection.Tasks != null && updatedSection.Tasks.Any())
                             {
-                                throw new OperationException(StatusCodes.Status400BadRequest, "Task guid is incorrect");
+                                if (section.Tasks != null)
+                                {
+                                    foreach (var task in section.Tasks)
+                                    {
+                                        var updatedTask = updatedSection.Tasks.SingleOrDefault(t => t.TaskGuid == task.TaskGuid.ToString());
+
+                                        if (updatedTask == null)
+                                            section.Tasks.Remove(task);
+                                        else
+                                        {
+                                            task.Name = task.Name;
+                                            task.Priority = task.Priority;
+                                            task.IsDone = task.IsDone;
+                                            task.Notes = task.Notes;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (section.Tasks == null)
+                                        section.Tasks = new List<Task>();
+
+                                    foreach (var newTask in updatedSection.Tasks)
+                                    {
+                                        section.Tasks.Add(new Task
+                                        {
+                                            Name = newTask.Name,
+                                            Priority = newTask.Priority,
+                                            IsDone = newTask.IsDone,
+                                            Notes = newTask.Notes
+                                        });
+                                    }
+                                }
                             }
-
-                            var task = await _uow.TaskRepo.SingleOrDefaultAsync(t => t.TaskGuid == taskGuid);
-
-                            if (task == null)
-                                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no task like this");
-
-                            task.Name = updatedTask.Name;
-                            task.Priority = updatedTask.Priority;
-                            task.IsDone = updatedTask.IsDone;
-                            task.Notes = updatedTask.Notes;
+                            else if (section.Tasks != null && section.Tasks.Any())
+                            {
+                                foreach (var taskToDelete in section.Tasks)
+                                {
+                                    section.Tasks.Remove(taskToDelete);
+                                }
+                            }
                         }
                     }
                 }
+                else
+                {
+                    foreach (var newSection in request.Sections)
+                    {
+                        if (toDoList.Sections == null)
+                            toDoList.Sections = new List<Section>();
+
+                        toDoList.Sections.Add(new Section
+                        {
+                            Name = newSection.Name,
+                            Tasks = newSection.Tasks?.Select(t => new Task
+                            {
+                                Name = t.Name,
+                                Priority = t.Priority,
+                                IsDone = t.IsDone,
+                                Notes = t.Notes
+                            }).ToList()
+                        });
+                    }
+                }
+            }
+            else if (toDoList.Sections != null && toDoList.Sections.Any())
+            {
+                foreach (var sectionToDelete in toDoList.Sections)
+                {
+                    toDoList.Sections.Remove(sectionToDelete);
+                }
             }
 
-            _uow.TodoListRepo.Update(toDoList);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.TodoListRepo.Update(toDoList);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return toDoList.ToGetToDoListResult();
         }
@@ -192,7 +256,14 @@ namespace API.Services
 
             toDoList.IsFavourite = request.IsFavourite;
 
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new SetFavouriteResult("ToDoList has been updated successfully!");
         }
@@ -211,7 +282,14 @@ namespace API.Services
 
             toDoList.ToDoListType = request.ToDoListType;
 
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new SetTemplateResult("ToDoList has been updated successfully!");
         }
@@ -228,8 +306,15 @@ namespace API.Services
             if (toDoList == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no ToDoList like this");
 
-            _uow.TodoListRepo.Remove(toDoList);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.TodoListRepo.Remove(toDoList);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new DeleteToDoListResult("ToDoList has been deleted successfully!");
         }
@@ -247,11 +332,12 @@ public static class ToDoListsServiceExtensions
             Description = toDoList.Description,
             IsFavourite = toDoList.IsFavourite,
             Name = toDoList.Name,
+            CreatedDate = toDoList.CreatedDate,
             Sections = toDoList.Sections?.Select(s => s.ToGetSectionResult())
         };
     }
 
-    public static GetSectionResult ToGetSectionResult(this Section section)
+    public static GetSectionResult ToGetSectionResult(this DAL.DataEntities.Section section)
     {
         return new GetSectionResult
         {
