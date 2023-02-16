@@ -15,6 +15,6 @@ namespace API.Models.ToDoLists
 
         public string? Description { get; set; }
 
-        public IEnumerable<EditSectionRequest>? Sections { get; set; }
+        public ICollection<GetSectionResult>? Sections { get; set; }
     }
 }

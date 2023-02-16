@@ -78,7 +78,7 @@ namespace API.Services
             if (groupGuid.IsNullOrEmpty())
             {
                 bills = (await _uow.BillRepo
-                    .WhereAsync(b =>  b.UserId == userId))
+                    .WhereAsync(b => b.UserId == userId))
                     .Select(td => (GetBillResult)td.ToCreateBillResult()).ToList();
             }
             else
@@ -119,20 +119,51 @@ namespace API.Services
 
             bill.Name = request.Name;
             bill.TotalValue = request.TotalValue;
-            foreach (var billItem in bill.BillItems)
+
+            if (request.BillItems != null)
             {
-                var updatedBillItem = request.BillItems.SingleOrDefault(bi => bi.BillItemGuid == billItem.BillItemGuid.ToString());
-                if (updatedBillItem != null)
+                if (bill.BillItems != null && bill.BillItems.Any())
                 {
-                    billItem.CategoryId = updatedBillItem.BillItemCategory.Id;
-                    billItem.Name = updatedBillItem.Name;
-                    billItem.TotalValue = updatedBillItem.TotalValue;
+                    foreach (var billItem in bill.BillItems)
+                    {
+                        var updatedBillItem = request.BillItems.SingleOrDefault(bi => bi.BillItemGuid == billItem.BillItemGuid.ToString());
+                        if (updatedBillItem != null)
+                        {
+                            billItem.CategoryId = updatedBillItem.BillItemCategory.Id;
+                            billItem.Name = updatedBillItem.Name;
+                            billItem.TotalValue = updatedBillItem.TotalValue;
+                        }
+                        else
+                        {
+                            _uow.BillItemRepo.Remove(billItem);
+                        }
+                    }
                 }
                 else
                 {
-                    _uow.BillItemRepo.Remove(billItem);
+                    if (bill.BillItems == null)
+                        bill.BillItems = new List<BillItem>();
+
+                    foreach (var newBillItem in request.BillItems)
+                    {
+                        //bill.BillItems.Add(new BillItem
+                        //{
+                        //    UserId = request.
+                        //})
+
+                    }
+
                 }
             }
+            else if (bill.BillItems != null && bill.BillItems.Any())
+            {
+                foreach (var billItemToDelete in bill.BillItems)
+                {
+                    bill.BillItems.Remove(billItemToDelete);
+                }
+            }
+
+
 
             _uow.BillRepo.Update(bill);
             await _uow.CompleteAsync();

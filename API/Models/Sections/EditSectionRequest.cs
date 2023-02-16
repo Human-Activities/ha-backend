@@ -8,6 +8,6 @@ namespace API.Models.Sections
 
         public string Name { get; set; }
 
-        public IEnumerable<EditTaskRequest>? Tasks { get; set; }
+        public ICollection<GetTaskResult>? Tasks { get; set; }
     }
 }

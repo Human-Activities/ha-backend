@@ -75,7 +75,7 @@ namespace API.Services
                 Description = toDoList.Description,
                 IsFavourite = toDoList.IsFavourite,
                 ToDoListType = toDoList.ToDoListType,
-                Sections = toDoList.Sections?.Select(s => s.ToGetSectionResult())
+                Sections = toDoList.Sections?.Select(s => s.ToGetSectionResult()).ToList()
             };
         }
 
@@ -166,10 +166,29 @@ namespace API.Services
                                             section.Tasks.Remove(task);
                                         else
                                         {
-                                            task.Name = task.Name;
-                                            task.Priority = task.Priority;
-                                            task.IsDone = task.IsDone;
-                                            task.Notes = task.Notes;
+                                            task.Name = updatedTask.Name;
+                                            task.Priority = updatedTask.Priority;
+                                            task.IsDone = updatedTask.IsDone;
+                                            task.Notes = updatedTask.Notes;
+
+                                            updatedSection.Tasks.Remove(updatedTask);
+                                        }
+                                    }
+
+                                    if (updatedSection.Tasks.Any())
+                                    {
+                                        if (section.Tasks == null)
+                                            section.Tasks = new List<Task>();
+
+                                        foreach (var newTask in updatedSection.Tasks)
+                                        {
+                                            section.Tasks.Add(new Task
+                                            {
+                                                Name = newTask.Name,
+                                                Priority = newTask.Priority,
+                                                IsDone = newTask.IsDone,
+                                                Notes = newTask.Notes
+                                            });
                                         }
                                     }
                                 }
@@ -197,16 +216,39 @@ namespace API.Services
                                     section.Tasks.Remove(taskToDelete);
                                 }
                             }
+
+                            request.Sections.Remove(updatedSection);
+                        }
+                    }
+
+                    if (request.Sections.Any())
+                    {
+                        if (toDoList.Sections == null)
+                            toDoList.Sections = new List<Section>();
+
+                        foreach (var newSection in request.Sections)
+                        {
+                            toDoList.Sections.Add(new Section
+                            {
+                                Name = newSection.Name,
+                                Tasks = newSection.Tasks?.Select(t => new Task
+                                {
+                                    Name = t.Name,
+                                    Priority = t.Priority,
+                                    IsDone = t.IsDone,
+                                    Notes = t.Notes
+                                }).ToList()
+                            });
                         }
                     }
                 }
                 else
                 {
+                    if (toDoList.Sections == null)
+                        toDoList.Sections = new List<Section>();
+
                     foreach (var newSection in request.Sections)
                     {
-                        if (toDoList.Sections == null)
-                            toDoList.Sections = new List<Section>();
-
                         toDoList.Sections.Add(new Section
                         {
                             Name = newSection.Name,
@@ -333,7 +375,7 @@ public static class ToDoListsServiceExtensions
             IsFavourite = toDoList.IsFavourite,
             Name = toDoList.Name,
             CreatedDate = toDoList.CreatedDate,
-            Sections = toDoList.Sections?.Select(s => s.ToGetSectionResult())
+            Sections = toDoList.Sections?.Select(s => s.ToGetSectionResult()).ToList()
         };
     }
 
@@ -343,7 +385,7 @@ public static class ToDoListsServiceExtensions
         {
             SectionGuid = section.SectionGuid.ToString(),
             Name = section.Name,
-            Tasks = section.Tasks?.Select(t => t.ToGetSectionResult())
+            Tasks = section.Tasks?.Select(t => t.ToGetSectionResult()).ToList()
         };
     }
 
