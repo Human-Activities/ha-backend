@@ -53,12 +53,17 @@ namespace API.Services
                     }).ToList()
             };
 
-            await _uow.BillRepo.AddAsync(bill);
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.BillRepo.AddAsync(bill);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
-            var createdBill = await _uow.BillRepo.SingleOrDefaultAsync(b => b.UserId == userId && b.AccountBillNumber == newAccountBillnumber);
-
-            return (CreateBillResult)createdBill.ToCreateBillResult();
+            return (CreateBillResult)bill.ToCreateBillResult();
         }
 
         public async Task<GetBillResult> GetBill(string BillGuid)
@@ -120,6 +125,14 @@ namespace API.Services
             bill.Name = request.Name;
             bill.TotalValue = request.TotalValue;
 
+            if (!Guid.TryParse(request.UserGuid, out Guid userGuid))
+                throw new OperationException(StatusCodes.Status400BadRequest, "User guid is incorrect");
+
+            var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
+
+            if (user == null)
+                throw new OperationException(StatusCodes.Status400BadRequest, "User with this guid does not exist");
+
             if (request.BillItems != null)
             {
                 if (bill.BillItems != null && bill.BillItems.Any())
@@ -132,10 +145,29 @@ namespace API.Services
                             billItem.CategoryId = updatedBillItem.BillItemCategory.Id;
                             billItem.Name = updatedBillItem.Name;
                             billItem.TotalValue = updatedBillItem.TotalValue;
+
+                            request.BillItems.Remove(updatedBillItem);
                         }
                         else
                         {
-                            _uow.BillItemRepo.Remove(billItem);
+                            bill.BillItems.Remove(billItem);
+                        }
+                    }
+
+                    if (request.BillItems.Any())
+                    {
+                        if (bill.BillItems == null)
+                            bill.BillItems = new List<BillItem>();
+
+                        foreach (var newBillItem in request.BillItems)
+                        {
+                            bill.BillItems.Add(new BillItem
+                            {
+                                UserId = user.Id,
+                                CategoryId = newBillItem.BillItemCategory.Id,
+                                Name = newBillItem.Name,
+                                TotalValue = newBillItem.TotalValue,
+                            });
                         }
                     }
                 }
@@ -146,13 +178,14 @@ namespace API.Services
 
                     foreach (var newBillItem in request.BillItems)
                     {
-                        //bill.BillItems.Add(new BillItem
-                        //{
-                        //    UserId = request.
-                        //})
-
+                        bill.BillItems.Add(new BillItem
+                        {
+                            UserId = user.Id,
+                            CategoryId = newBillItem.BillItemCategory.Id,
+                            Name = newBillItem.Name,
+                            TotalValue = newBillItem.TotalValue,
+                        });
                     }
-
                 }
             }
             else if (bill.BillItems != null && bill.BillItems.Any())
@@ -163,10 +196,15 @@ namespace API.Services
                 }
             }
 
-
-
-            _uow.BillRepo.Update(bill);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.BillRepo.Update(bill);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return (EditBillResult)bill.ToCreateBillResult();
         }
@@ -187,8 +225,15 @@ namespace API.Services
             if (bill == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no Bill like this");
 
-            _uow.BillRepo.Remove(bill);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.BillRepo.Remove(bill);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new DeleteBillResult("Bill has been deleted successfully!");
         }
@@ -223,7 +268,7 @@ namespace API.Services
                             AuthorGuid = b.User.UserGuid.ToString(),
                             Name = b.User.Login
                         }
-                    })
+                    }).ToList()
             };
         }
     }
