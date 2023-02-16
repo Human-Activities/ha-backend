@@ -70,7 +70,9 @@ namespace API.Services
                 await _uow.CompleteAsync();
             }
             catch (Exception ex)
-            { }
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             var createdUser = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == request.Login);
 
@@ -81,8 +83,15 @@ namespace API.Services
                 Salt = salt
             };
 
-            await _uow.UserIdentityRepo.AddAsync(createdUserIdentity);
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.UserIdentityRepo.AddAsync(createdUserIdentity);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new RegisterResult { IsSuccess = true, Message = "Poprawnie utworzono użytkownika." };
         }
@@ -140,9 +149,15 @@ namespace API.Services
         {
             var userRefreshToken = await _uow.UserRefreshTokenRepo.FindAsync(userId);
 
-            _uow.UserRefreshTokenRepo.Remove(userRefreshToken);
-
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.UserRefreshTokenRepo.Remove(userRefreshToken);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new LogoutResult("User has been logged out successfully.");
         }
