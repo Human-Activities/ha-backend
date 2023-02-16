@@ -19,7 +19,7 @@ namespace API.Services
             _uow = DataAccessLayerFactory.CreateUnitOfWork();
         }
 
-        public async Task<CreateGroupResult> CreateGroup(CreateGroupRequest request, int userId)
+        public async Task<GetGroupResult> CreateGroup(CreateGroupRequest request, int userId)
         {
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "Group name can't be empty");
@@ -39,6 +39,7 @@ namespace API.Services
             {
                 throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
+
             try
             {
                 await _uow.UserGroupRepo.AddAsync(new UserGroups
@@ -53,7 +54,7 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
-            return new CreateGroupResult("Group has been created succesfully!");
+            return group.ToGetGroupResult();
         }
 
         public async Task<GetGroupResult> GetGroup(string groupGuid)
@@ -63,34 +64,30 @@ namespace API.Services
             if (group == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no group like this");
 
-            return new GetGroupResult
-            {
-                GroupGuid = group.GroupGuid.ToString(),
-                Name = group.Name,
-                Description = group.Description,
-                Users = group.UserGroups.Select(
-                    u => new UserViewModel
-                    {
-                        Login = u.User.Login,
-                        Name = u.User.Name,
-                        LastName = u.User.LastName
-                    })
-            };
+            return group.ToGetGroupResult();
         }
 
         public async Task<IEnumerable<GetGroupResult>> GetGroups(int userId)
         {
-            var groups = (await _uow.UserGroupRepo.WhereAsync(ug => ug.UserId == userId)).Select(ug => ug.Group);
+            var userGroups = (await _uow.UserGroupRepo.WhereAsync(ug => ug.UserId == userId));
 
-            return groups.Select(g => g.ToGetActivitiesResult());
+            if (userGroups == null)
+                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no group like this");
+
+            var groups = userGroups.Select(ug => ug.Group);
+
+            return groups.Select(g => g.ToGetGroupResult());
         }
 
-        public async Task<EditGroupResult> EditGroup(EditGroupRequest request)
+        public async Task<GetGroupResult> EditGroup(EditGroupRequest request)
         {
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "Group name can't be empty");
 
-            var group = await _uow.GroupRepo.SingleOrDefaultAsync(g => g.GroupGuid == Guid.Parse(request.GroupGuid));
+            if (!Guid.TryParse(request.GroupGuid, out Guid groupGuid))
+                throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. Group guid is incorrect");
+
+            var group = await _uow.GroupRepo.SingleOrDefaultAsync(g => g.GroupGuid == groupGuid);
 
             if (group == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no group like this");
@@ -98,20 +95,17 @@ namespace API.Services
             group.Name = request.Name;
             group.Description = request.Description;
 
-            _uow.GroupRepo.Update(group);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.GroupRepo.Update(group);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
-            return new EditGroupResult("Group has been edited successfully!");
-        }
-
-        /// <summary>
-        /// function for adding user to group, by using generated link
-        /// </summary>
-        /// <param name="link">param with Group guid and user id</param> 
-        /// <returns>information that user has been added to group successfulyy</returns>
-        public async Task<string> AddUserToGroup(string link)
-        {
-            return "Added user succesfully";
+            return group.ToGetGroupResult();
         }
 
         public async Task<DeleteGroupResult> DeleteGroup(string groupGuid)
@@ -121,8 +115,15 @@ namespace API.Services
             if (group == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no group like this");
 
-            _uow.GroupRepo.Remove(group);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.GroupRepo.Remove(group);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new DeleteGroupResult("Group has been deleted successfully!");
         }
@@ -131,7 +132,7 @@ namespace API.Services
 
 public static class GroupsServiceExtensions
 {
-    public static GetGroupResult ToGetActivitiesResult(this Group group)
+    public static GetGroupResult ToGetGroupResult(this Group group)
     {
         return new GetGroupResult
         {

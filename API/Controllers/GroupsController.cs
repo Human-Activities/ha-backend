@@ -18,7 +18,7 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
-        [ProducesResponseType(typeof(CreateGroupResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
@@ -47,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPut("edit")]
-        [ProducesResponseType(typeof(EditGroupResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditGroup(EditGroupRequest request)
         {
             var result = await _groupService.EditGroup(request);
