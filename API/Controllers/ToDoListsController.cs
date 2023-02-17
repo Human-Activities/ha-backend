@@ -18,6 +18,7 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateToDoList(CreateToDoListRequest request)
         {
@@ -28,6 +29,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get/{toDoListGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetToDoList(string toDoListGuid)
         {
@@ -37,6 +39,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-all/{groupGuid?}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetToDoLists(string? groupGuid = null)
         {
@@ -58,6 +61,7 @@ namespace API.Controllers
         }
 
         [HttpPut("edit")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditToDoList(EditToDoListRequest request)
         {
@@ -67,6 +71,7 @@ namespace API.Controllers
         }
 
         [HttpPut("set-favourite")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(SetFavouriteResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> SetFavourite(SetFavouriteRequest request)
         {
@@ -76,6 +81,7 @@ namespace API.Controllers
         }
 
         [HttpPut("set-template")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(SetTemplateResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> SetTemplate(SetTemplateRequest request)
         {
@@ -85,6 +91,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{toDoListGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(DeleteToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteToDoList(string toDoListGuid)
         {

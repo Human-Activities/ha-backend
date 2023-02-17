@@ -1,6 +1,8 @@
 ﻿using API.Models.Categories;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace API.Controllers
 {
@@ -16,6 +18,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-activity-categories")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<ActivityCategory>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvityCategories()
         {
@@ -25,6 +28,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-bill-item-categories")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<BillItemCategory>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBillItemCategories()
         {

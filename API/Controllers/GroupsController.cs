@@ -1,7 +1,9 @@
 ﻿using API.Models.Activities;
 using API.Models.Groups;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -18,6 +20,7 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
@@ -28,6 +31,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get/{groupGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGroup(string groupGuid)
         {
@@ -37,6 +41,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<GetGroupResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetGroups()
         {
@@ -47,6 +52,7 @@ namespace API.Controllers
         }
 
         [HttpPut("edit")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditGroup(EditGroupRequest request)
         {
@@ -56,6 +62,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{groupGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(DeleteGroupResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteGroup(string groupGuid)
         {
