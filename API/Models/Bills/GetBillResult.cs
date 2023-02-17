@@ -1,6 +1,6 @@
 ﻿namespace API.Models.Bills
 {
-    public class GetBillResult : CreateBillRequest
+    public class GetBillResult : CreateBillResult
     {
     }
 }

@@ -125,7 +125,6 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no Bill like this");
 
             bill.Name = request.Name;
-            bill.TotalValue = request.TotalValue;
 
             if (!Guid.TryParse(request.UserGuid, out Guid userGuid))
                 throw new OperationException(StatusCodes.Status400BadRequest, "User guid is incorrect");
@@ -246,9 +245,9 @@ namespace API.Services
 
     public static class BillServiceExtensions
     {
-        public static CreateBillRequest ToCreateBillResult(this Bill bill)
+        public static CreateBillResult ToCreateBillResult(this Bill bill)
         {
-            return new CreateBillRequest
+            return new CreateBillResult
             {
                 BillGuid = bill.BillGuid.ToString(),
                 UserGuid = bill.User.UserGuid.ToString(),
