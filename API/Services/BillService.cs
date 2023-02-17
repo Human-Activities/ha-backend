@@ -41,7 +41,6 @@ namespace API.Services
                 UserId = userId,
                 GroupId = group?.Id,
                 Name = request.Name,
-                TotalValue = request.TotalValue,
                 AccountBillNumber = newAccountBillnumber,
                 BillItems = request.BillItems.Select(
                     bi => new BillItem
@@ -52,6 +51,9 @@ namespace API.Services
                         CategoryId = bi.BillItemCategory.Id
                     }).ToList()
             };
+
+            if (bill.BillItems != null && bill.BillItems.Any())
+                bill.TotalValue = bill.BillItems.Sum(b => b.TotalValue);
 
             try
             {
@@ -195,6 +197,9 @@ namespace API.Services
                     bill.BillItems.Remove(billItemToDelete);
                 }
             }
+
+            if (bill.BillItems != null && bill.BillItems.Any())
+                bill.TotalValue = bill.BillItems.Sum(b => b.TotalValue);
 
             try
             {
