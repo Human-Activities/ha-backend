@@ -40,12 +40,16 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
+            var user = await _uow.UserRepo.FindAsync(userId);
+
             try
             {
                 await _uow.UserGroupRepo.AddAsync(new UserGroups
                 {
                     UserId = userId,
-                    GroupId = group.Id
+                    GroupId = group.Id,
+                    User = user,
+                    Group = group
                 });
                 await _uow.CompleteAsync();
             }
@@ -108,6 +112,7 @@ namespace API.Services
             return group.ToGetGroupResult();
         }
 
+        // do poprawienia
         public async Task<DeleteGroupResult> DeleteGroup(string groupGuid)
         {
             var group = await _uow.GroupRepo.SingleOrDefaultAsync(g => g.GroupGuid == Guid.Parse(groupGuid));
