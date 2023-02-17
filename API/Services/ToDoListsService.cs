@@ -160,12 +160,16 @@ namespace API.Services
             {
                 if (toDoList.Sections != null && toDoList.Sections.Any())
                 {
+                    var sectionsToDelete = new List<Section>();
+
                     foreach (var section in toDoList.Sections)
                     {
                         var updatedSection = request.Sections.SingleOrDefault(s => s.SectionGuid == section.SectionGuid.ToString());
 
                         if (updatedSection == null)
-                            toDoList.Sections.Remove(section);
+                        {
+                            sectionsToDelete.Add(section);
+                        }
                         else
                         {
                             section.Name = section.Name;
@@ -174,12 +178,15 @@ namespace API.Services
                             {
                                 if (section.Tasks != null)
                                 {
+                                    var tasksToDelete = new List<Task>(); 
                                     foreach (var task in section.Tasks)
                                     {
                                         var updatedTask = updatedSection.Tasks.SingleOrDefault(t => t.TaskGuid == task.TaskGuid.ToString());
 
                                         if (updatedTask == null)
-                                            section.Tasks.Remove(task);
+                                        {
+                                            tasksToDelete.Add(task);
+                                        }
                                         else
                                         {
                                             task.Name = updatedTask.Name;
@@ -188,6 +195,14 @@ namespace API.Services
                                             task.Notes = updatedTask.Notes;
 
                                             updatedSection.Tasks.Remove(updatedTask);
+                                        }
+                                    }
+
+                                    if (tasksToDelete.Any())
+                                    {
+                                        foreach(var taskDoDelete in tasksToDelete)
+                                        {
+                                            section.Tasks.Remove(taskDoDelete);
                                         }
                                     }
 
@@ -234,6 +249,14 @@ namespace API.Services
                             }
 
                             request.Sections.Remove(updatedSection);
+                        }
+                    }
+
+                    if (sectionsToDelete.Any())
+                    {
+                        foreach (var sectionToDelete in sectionsToDelete)
+                        {
+                            toDoList.Sections.Remove(sectionToDelete);
                         }
                     }
 

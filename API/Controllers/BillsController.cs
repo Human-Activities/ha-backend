@@ -52,6 +52,7 @@ namespace API.Controllers
         }
 
         [HttpPut("edit")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditBill(EditBillRequest request)
         {
