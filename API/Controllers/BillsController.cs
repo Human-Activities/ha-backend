@@ -36,7 +36,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get/{groupGuid?}")]
+        [HttpGet("get-all/{groupGuid?}")]
         [ProducesResponseType(typeof(IEnumerable<GetBillResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBills(string? groupGuid = null)
         {
