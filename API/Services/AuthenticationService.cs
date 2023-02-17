@@ -122,17 +122,7 @@ namespace API.Services
             if (request == null)
                 throw new OperationException(StatusCodes.Status400BadRequest, "Invalid client request.");
 
-            bool isValidAccessToken = _accessTokenValidator.Validate(request.AccessToken);
-
-            if (!isValidAccessToken)
-                throw new OperationException(StatusCodes.Status400BadRequest, "Invalid access token.");
-
-            UserRefreshToken? userRefreshToken = await _uow.UserRefreshTokenRepo.FindAsync(userId);
-
-            if (userRefreshToken == null)
-                throw new OperationException(StatusCodes.Status400BadRequest, "Invalid refresh token.");
-
-            bool isValidRefreshToken = _refreshTokenValidator.Validate(userRefreshToken.Token);
+            bool isValidRefreshToken = _refreshTokenValidator.Validate(request.RefreshToken);
 
             if (!isValidRefreshToken)
                 throw new OperationException(StatusCodes.Status400BadRequest, "Invalid refresh token.");
@@ -142,7 +132,7 @@ namespace API.Services
             if (user == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "User not found.");
 
-            return await _authenticator.RefreshAccessToken(user, userRefreshToken.Token, _uow);
+            return await _authenticator.RefreshAccessToken(user, request.RefreshToken, _uow);
         }
 
         public async Task<LogoutResult> Logout(int userId)
