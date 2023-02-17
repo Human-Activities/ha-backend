@@ -38,8 +38,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(RefreshResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> Refresh(RefreshRequest request)
         {
-            int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
-            var result = await _authenticationService.Refresh(request, userId);
+            var result = await _authenticationService.Refresh(request);
             return Ok(result);
         }
 
