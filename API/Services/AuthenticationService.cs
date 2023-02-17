@@ -62,7 +62,7 @@ namespace API.Services
                 DateOfBirth = request.DateOfBirth,
                 Login = request.Login,
                 PasswordHash = passwordHash,
-                RoleId = (int)RoleType.LoggedUser
+                RoleId = 2 //(int)RoleType.LoggedUser
             };
 
             try
