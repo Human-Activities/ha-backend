@@ -10,6 +10,6 @@
         public DateTime? CreatedDate { get; set;}
         public int? AccountBillNumber { get; set;}
         
-        public ICollection<CreateBillItemRequest> BillItems { get; set;}
+        public ICollection<CreateBillItemResult> BillItems { get; set;}
     }
 }

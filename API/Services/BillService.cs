@@ -48,7 +48,7 @@ namespace API.Services
                         UserId = userId,
                         Name = bi.Name,
                         TotalValue = bi.TotalValue,
-                        CategoryId = bi.BillItemCategory.Id
+                        CategoryId = bi.CategoryId
                     }).ToList()
             };
 
@@ -144,7 +144,7 @@ namespace API.Services
                         var updatedBillItem = request.BillItems.SingleOrDefault(bi => bi.BillItemGuid == billItem.BillItemGuid.ToString());
                         if (updatedBillItem != null)
                         {
-                            billItem.CategoryId = updatedBillItem.BillItemCategory.Id;
+                            billItem.CategoryId = updatedBillItem.CategoryId;
                             billItem.Name = updatedBillItem.Name;
                             billItem.TotalValue = updatedBillItem.TotalValue;
 
@@ -166,7 +166,7 @@ namespace API.Services
                             bill.BillItems.Add(new BillItem
                             {
                                 UserId = user.Id,
-                                CategoryId = newBillItem.BillItemCategory.Id,
+                                CategoryId = newBillItem.CategoryId,
                                 Name = newBillItem.Name,
                                 TotalValue = newBillItem.TotalValue,
                             });
@@ -183,7 +183,7 @@ namespace API.Services
                         bill.BillItems.Add(new BillItem
                         {
                             UserId = user.Id,
-                            CategoryId = newBillItem.BillItemCategory.Id,
+                            CategoryId = newBillItem.CategoryId,
                             Name = newBillItem.Name,
                             TotalValue = newBillItem.TotalValue,
                         });
@@ -258,11 +258,12 @@ namespace API.Services
                 CreatedDate = bill.CreatedDate,
                 AccountBillNumber = bill.AccountBillNumber,
                 BillItems = bill.BillItems.Select(
-                    b => new CreateBillItemRequest
+                    b => new CreateBillItemResult
                     {
                         BillItemGuid = b.BillItemGuid.ToString(),
                         Name = b.Name,
                         TotalValue = b.TotalValue,
+                        CategoryId= b.CategoryId,
                         BillItemCategory = new BillItemCategory
                         {
                             Id = b.CategoryId,
