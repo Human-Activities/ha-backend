@@ -19,7 +19,7 @@ namespace DAL.DataEntities
 
         public string Name { get; set; }
 
-        public double TotalValue { get; set; }
+        public double? TotalValue { get; set; }
 
         public DateTime CreatedDate { get; set; }
 
