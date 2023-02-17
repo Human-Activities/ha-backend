@@ -20,18 +20,16 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateBill(CreateBillRequest request)
         {
-            var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
+            var userId = 3;
             var result = await _billService.CreateBill(request, userId);
 
             return Ok(result);
         }
 
         [HttpGet("get/{billGuid}")]
-        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBill(string billGuid)
         {
@@ -41,18 +39,16 @@ namespace API.Controllers
         }
 
         [HttpGet("get-all/{groupGuid?}")]
-        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<CreateBillResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBills(string? groupGuid = null)
         {
-            var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
+            var userId = 3;
             var result = await _billService.GetBills(userId, groupGuid);
 
             return Ok(result);
         }
 
         [HttpPut("edit")]
-        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditBill(EditBillRequest request)
         {
@@ -62,7 +58,6 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{billGuid}")]
-        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(DeleteBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteBill(string billGuid)
         {

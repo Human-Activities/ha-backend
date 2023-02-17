@@ -36,6 +36,9 @@ namespace API.Services
             if (bills.Any())
                 newAccountBillnumber = bills.ToList().Max(b => b.AccountBillNumber) + 1;
 
+            var user = await _uow.UserRepo.FindAsync(userId);
+            var categories = await _uow.CategoryRepo.GetAllAsync();
+
             var bill = new Bill
             {
                 UserId = userId,
@@ -48,8 +51,12 @@ namespace API.Services
                         UserId = userId,
                         Name = bi.Name,
                         TotalValue = bi.TotalValue,
-                        CategoryId = bi.CategoryId
-                    }).ToList()
+                        CategoryId = bi.CategoryId,
+                        User = user,
+                        Category = categories.First(c => c.Id == bi.CategoryId)
+                    }).ToList(),
+                User = user,
+                Group = group
             };
 
             if (bill.BillItems != null && bill.BillItems.Any())
@@ -262,7 +269,7 @@ namespace API.Services
                         BillItemGuid = b.BillItemGuid.ToString(),
                         Name = b.Name,
                         TotalValue = b.TotalValue,
-                        CategoryId= b.CategoryId,
+                        CategoryId = b.CategoryId,
                         BillItemCategory = new BillItemCategory
                         {
                             Id = b.CategoryId,
