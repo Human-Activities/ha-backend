@@ -5,6 +5,8 @@ namespace API.Models.ToDoLists
 {
     public class CreateToDoListRequest
     {
+        public string? GroupGuid { get; set; }
+
         public string Name { get; set; }
 
         public ToDoListType ToDoListType { get; set; }

@@ -31,7 +31,6 @@ namespace API.Services
                 Description = request.Description,
                 IsFavourite = request.IsFavourite,
                 ToDoListType = request.ToDoListType,
-                UserId = userId,
                 Sections = request.Sections?.Select(s => new Section
                 {
                     Name = s.Name,
@@ -44,6 +43,23 @@ namespace API.Services
                     }).ToList()
                 }).ToList()
             };
+
+            if (request.GroupGuid != null)
+            {
+                if (Guid.TryParse(request.GroupGuid, out Guid groupGuid))
+                    throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
+
+                var group = await _uow.GroupRepo.SingleOrDefaultAsync(g => g.GroupGuid == groupGuid);
+
+                if (group == null)
+                    throw new OperationException(StatusCodes.Status400BadRequest, "Couldn't find group like this");
+
+                toDoList.GroupId = group.Id;
+            }
+            else
+            {
+                toDoList.UserId = userId;
+            }
 
             try
             {
