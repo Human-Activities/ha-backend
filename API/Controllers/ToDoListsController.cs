@@ -2,7 +2,6 @@
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -39,7 +38,7 @@ namespace API.Controllers
 
         [HttpGet("get-all/{groupGuid?}")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetToDoLists(string? groupGuid = null) // jesli ToDoListId null to wez po userid
+        public async Task<IActionResult> GetToDoLists(string? groupGuid = null)
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _toDoListService.GetToDoLists(userId, groupGuid);

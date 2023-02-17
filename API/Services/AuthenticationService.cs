@@ -7,6 +7,7 @@ using Services;
 using Services.PasswordHasher;
 using API.Exceptions;
 using API.Models.Authentication;
+using DAL.CommonVariables;
 
 namespace API.Services
 {
@@ -61,7 +62,7 @@ namespace API.Services
                 DateOfBirth = request.DateOfBirth,
                 Login = request.Login,
                 PasswordHash = passwordHash,
-                RoleId = 2
+                RoleId = (int)RoleType.LoggedUser
             };
 
             try
@@ -130,7 +131,7 @@ namespace API.Services
             var userRefreshToken = await _uow.UserRefreshTokenRepo.SingleOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
             if (userRefreshToken == null)
-                throw new OperationException(StatusCodes.Status500InternalServerError, "User not found.");
+                throw new OperationException(StatusCodes.Status500InternalServerError, "UserRefreshToken not found.");
 
             return await _authenticator.RefreshAccessToken(userRefreshToken.User, request.RefreshToken, _uow);
         }

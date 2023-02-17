@@ -1,4 +1,5 @@
-﻿using DAL;
+﻿using API.Exceptions;
+using DAL;
 using DAL.DataEntities;
 using DAL.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
@@ -147,7 +148,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
             return Ok();
@@ -320,7 +321,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
             return Ok();
@@ -349,7 +350,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
             return Ok();
