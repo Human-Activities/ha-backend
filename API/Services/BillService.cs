@@ -65,28 +65,28 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
-            return (CreateBillResult)bill.ToCreateBillResult();
+            return bill.ToCreateBillResult();
         }
 
-        public async Task<GetBillResult> GetBill(string BillGuid)
+        public async Task<CreateBillResult> GetBill(string BillGuid)
         {
             var bill = await _uow.BillRepo.SingleOrDefaultAsync(a => a.BillGuid == Guid.Parse(BillGuid));
 
             if (bill == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no Bill like this");
 
-            return (GetBillResult)bill.ToCreateBillResult();
+            return bill.ToCreateBillResult();
         }
 
-        public async Task<IEnumerable<GetBillResult>> GetBills(int userId, string? groupGuid)
+        public async Task<IEnumerable<CreateBillResult>> GetBills(int userId, string? groupGuid)
         {
-            var bills = new List<GetBillResult>();
+            var bills = new List<CreateBillResult>();
 
             if (groupGuid.IsNullOrEmpty())
             {
                 bills = (await _uow.BillRepo
                     .WhereAsync(b => b.UserId == userId))
-                    .Select(td => (GetBillResult)td.ToCreateBillResult()).ToList();
+                    .Select(td => td.ToCreateBillResult()).ToList();
             }
             else
             {
@@ -96,7 +96,7 @@ namespace API.Services
                     if (group == null)
                         throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
 
-                    bills = (await _uow.BillRepo.WhereAsync(b => b.GroupId == group.Id)).Select(b => (GetBillResult)b.ToCreateBillResult()).ToList();
+                    bills = (await _uow.BillRepo.WhereAsync(b => b.GroupId == group.Id)).Select(b => b.ToCreateBillResult()).ToList();
                 }
                 else
                     throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
@@ -105,7 +105,7 @@ namespace API.Services
             return bills;
         }
 
-        public async Task<EditBillResult> EditBill(EditBillRequest request)
+        public async Task<CreateBillResult> EditBill(EditBillRequest request)
         {
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "Bill name can't be empty");
@@ -210,7 +210,7 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
-            return (EditBillResult)bill.ToCreateBillResult();
+            return bill.ToCreateBillResult();
         }
 
         public async Task<DeleteBillResult> DeleteBill(string billGuidAsString)

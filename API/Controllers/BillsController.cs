@@ -32,7 +32,7 @@ namespace API.Controllers
 
         [HttpGet("get/{billGuid}")]
         [Authorize(Roles = "loggedUser")]
-        [ProducesResponseType(typeof(GetBillResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBill(string billGuid)
         {
             var result = await _billService.GetBill(billGuid);
@@ -42,7 +42,7 @@ namespace API.Controllers
 
         [HttpGet("get-all/{groupGuid?}")]
         [Authorize(Roles = "loggedUser")]
-        [ProducesResponseType(typeof(IEnumerable<GetBillResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<CreateBillResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBills(string? groupGuid = null)
         {
             var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
@@ -53,7 +53,7 @@ namespace API.Controllers
 
         [HttpPut("edit")]
         [Authorize(Roles = "loggedUser")]
-        [ProducesResponseType(typeof(EditBillResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditBill(EditBillRequest request)
         {
             var result = await _billService.EditBill(request);
