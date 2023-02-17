@@ -270,6 +270,7 @@ namespace API.Services
                         Name = b.Name,
                         TotalValue = b.TotalValue,
                         CategoryId = b.CategoryId,
+                        UserGuid = b.User.UserGuid.ToString(),
                         BillItemCategory = new BillItemCategory
                         {
                             Id = b.CategoryId,
