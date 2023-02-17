@@ -1,7 +1,9 @@
 ﻿using API.Models.Activities;
 using API.Models.Bills;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -18,17 +20,19 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateBill(CreateBillRequest request)
         {
-            var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
+            int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _billService.CreateBill(request, userId);
 
             return Ok(result);
         }
 
         [HttpGet("get/{billGuid}")]
-        [ProducesResponseType(typeof(GetBillResult), StatusCodes.Status200OK)]
+        [Authorize(Roles = "loggedUser")]
+        [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBill(string billGuid)
         {
             var result = await _billService.GetBill(billGuid);
@@ -36,18 +40,20 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get/{groupGuid?}")]
-        [ProducesResponseType(typeof(IEnumerable<GetBillResult>), StatusCodes.Status200OK)]
+        [HttpGet("get-all/{groupGuid?}")]
+        [Authorize(Roles = "loggedUser")]
+        [ProducesResponseType(typeof(IEnumerable<CreateBillResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetBills(string? groupGuid = null)
         {
-            var userId = int.Parse(HttpContext.User.FindFirstValue("id"));
+            int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _billService.GetBills(userId, groupGuid);
 
             return Ok(result);
         }
 
         [HttpPut("edit")]
-        [ProducesResponseType(typeof(EditBillResult), StatusCodes.Status200OK)]
+        [Authorize(Roles = "loggedUser")]
+        [ProducesResponseType(typeof(CreateBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditBill(EditBillRequest request)
         {
             var result = await _billService.EditBill(request);
@@ -56,6 +62,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{billGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(DeleteBillResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteBill(string billGuid)
         {

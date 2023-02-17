@@ -77,6 +77,15 @@ namespace DAL.DataContext
             {
                 entity.Property(e => e.GroupGuid)
                 .HasValueGenerator<GuidValueGenerator>();
+
+                entity.Property(e => e.Name)
+                .HasMaxLength(100);
+
+                entity.Property(e => e.Description)
+                .HasMaxLength(600);
+
+                entity.Property(e => e.Link)
+                .HasMaxLength(200);
             });
 
             modelBuilder.Entity<Section>(entity =>
@@ -105,11 +114,44 @@ namespace DAL.DataContext
                 entity.Property(e => e.UserGuid)
                 .HasValueGenerator<GuidValueGenerator>();
 
+                entity.Property(e => e.Name)
+                .HasMaxLength(100);
+
+                entity.Property(e => e.LastName)
+                .HasMaxLength(100);
+
+                entity.Property(e => e.Login)
+                .HasMaxLength(100);
+
+                entity.Property(e => e.PasswordHash)
+                .HasMaxLength(500);
+
                 entity.HasOne(e => e.UserRole)
                     .WithMany(u => u.Users)
                     .HasForeignKey(e => e.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_user_user_role_id");
+            });
+
+            modelBuilder.Entity<UserGroups>(entity =>
+            {
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.UserGroups)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_user_user_id");
+
+                entity.HasOne(e => e.Group)
+                    .WithMany(u => u.UserGroups)
+                    .HasForeignKey(e => e.GroupId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_group_group_id");
+            });
+
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.Property(e => e.Name)
+                .HasMaxLength(100);
             });
 
             modelBuilder.Entity<UserIdentity>(entity =>

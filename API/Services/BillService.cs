@@ -36,12 +36,14 @@ namespace API.Services
             if (bills.Any())
                 newAccountBillnumber = bills.ToList().Max(b => b.AccountBillNumber) + 1;
 
+            var user = await _uow.UserRepo.FindAsync(userId);
+            var categories = await _uow.CategoryRepo.GetAllAsync();
+
             var bill = new Bill
             {
                 UserId = userId,
                 GroupId = group?.Id,
                 Name = request.Name,
-                TotalValue = request.TotalValue,
                 AccountBillNumber = newAccountBillnumber,
                 BillItems = request.BillItems.Select(
                     bi => new BillItem
@@ -49,37 +51,49 @@ namespace API.Services
                         UserId = userId,
                         Name = bi.Name,
                         TotalValue = bi.TotalValue,
-                        CategoryId = bi.BillItemCategory.Id
-                    }).ToList()
+                        CategoryId = bi.CategoryId,
+                        User = user,
+                        Category = categories.First(c => c.Id == bi.CategoryId)
+                    }).ToList(),
+                User = user,
+                Group = group
             };
 
-            await _uow.BillRepo.AddAsync(bill);
-            await _uow.CompleteAsync();
+            if (bill.BillItems != null && bill.BillItems.Any())
+                bill.TotalValue = bill.BillItems.Sum(b => b.TotalValue);
 
-            var createdBill = await _uow.BillRepo.SingleOrDefaultAsync(b => b.UserId == userId && b.AccountBillNumber == newAccountBillnumber);
+            try
+            {
+                await _uow.BillRepo.AddAsync(bill);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
-            return (CreateBillResult)createdBill.ToCreateBillResult();
+            return bill.ToCreateBillResult();
         }
 
-        public async Task<GetBillResult> GetBill(string BillGuid)
+        public async Task<CreateBillResult> GetBill(string BillGuid)
         {
             var bill = await _uow.BillRepo.SingleOrDefaultAsync(a => a.BillGuid == Guid.Parse(BillGuid));
 
             if (bill == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no Bill like this");
 
-            return (GetBillResult)bill.ToCreateBillResult();
+            return bill.ToCreateBillResult();
         }
 
-        public async Task<IEnumerable<GetBillResult>> GetBills(int userId, string? groupGuid)
+        public async Task<IEnumerable<CreateBillResult>> GetBills(int userId, string? groupGuid)
         {
-            var bills = new List<GetBillResult>();
+            var bills = new List<CreateBillResult>();
 
             if (groupGuid.IsNullOrEmpty())
             {
                 bills = (await _uow.BillRepo
-                    .WhereAsync(b =>  b.UserId == userId))
-                    .Select(td => (GetBillResult)td.ToCreateBillResult()).ToList();
+                    .WhereAsync(b => b.UserId == userId))
+                    .Select(td => td.ToCreateBillResult()).ToList();
             }
             else
             {
@@ -89,7 +103,7 @@ namespace API.Services
                     if (group == null)
                         throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
 
-                    bills = (await _uow.BillRepo.WhereAsync(b => b.GroupId == group.Id)).Select(b => (GetBillResult)b.ToCreateBillResult()).ToList();
+                    bills = (await _uow.BillRepo.WhereAsync(b => b.GroupId == group.Id)).Select(b => b.ToCreateBillResult()).ToList();
                 }
                 else
                     throw new OperationException(StatusCodes.Status400BadRequest, "Group guid is incorrect");
@@ -98,7 +112,7 @@ namespace API.Services
             return bills;
         }
 
-        public async Task<EditBillResult> EditBill(EditBillRequest request)
+        public async Task<CreateBillResult> EditBill(EditBillRequest request)
         {
             if (request.Name.IsNullOrEmpty())
                 throw new OperationException(StatusCodes.Status400BadRequest, "Bill name can't be empty");
@@ -118,26 +132,110 @@ namespace API.Services
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no Bill like this");
 
             bill.Name = request.Name;
-            bill.TotalValue = request.TotalValue;
-            foreach (var billItem in bill.BillItems)
+
+            if (!Guid.TryParse(request.UserGuid, out Guid userGuid))
+                throw new OperationException(StatusCodes.Status400BadRequest, "User guid is incorrect");
+
+            var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.UserGuid == userGuid);
+
+            if (user == null)
+                throw new OperationException(StatusCodes.Status400BadRequest, "User with this guid does not exist");
+
+            var categories = await _uow.CategoryRepo.GetAllAsync();
+
+            if (request.BillItems != null)
             {
-                var updatedBillItem = request.BillItems.SingleOrDefault(bi => bi.BillItemGuid == billItem.BillItemGuid.ToString());
-                if (updatedBillItem != null)
+                if (bill.BillItems != null && bill.BillItems.Any())
                 {
-                    billItem.CategoryId = updatedBillItem.BillItemCategory.Id;
-                    billItem.Name = updatedBillItem.Name;
-                    billItem.TotalValue = updatedBillItem.TotalValue;
+                    var billItemsToDelete = new List<BillItem>();
+
+                    foreach (var billItem in bill.BillItems)
+                    {
+                        var updatedBillItem = request.BillItems.SingleOrDefault(bi => bi.BillItemGuid == billItem.BillItemGuid.ToString());
+                        if (updatedBillItem != null)
+                        {
+                            billItem.CategoryId = updatedBillItem.CategoryId;
+                            billItem.Name = updatedBillItem.Name;
+                            billItem.TotalValue = updatedBillItem.TotalValue;
+
+                            request.BillItems.Remove(updatedBillItem);
+                        }
+                        else
+                        {
+                            billItemsToDelete.Add(billItem);
+                            //bill.BillItems.Remove(billItem);
+                        }
+                    }
+
+                    if (billItemsToDelete.Any())
+                    {
+                        foreach (var billItemToDelete in billItemsToDelete)
+                        {
+                            bill.BillItems.Remove(billItemToDelete);
+                        }
+                    }
+
+                    if (request.BillItems.Any())
+                    {
+                        if (bill.BillItems == null)
+                            bill.BillItems = new List<BillItem>();
+
+
+                        foreach (var newBillItem in request.BillItems)
+                        {
+                            bill.BillItems.Add(new BillItem
+                            {
+                                UserId = user.Id,
+                                CategoryId = newBillItem.CategoryId,
+                                Name = newBillItem.Name,
+                                TotalValue = newBillItem.TotalValue,
+                                User = user,
+                                Category = categories.First(c => c.Id == newBillItem.CategoryId)
+                            });
+                        }
+                    }
                 }
                 else
                 {
-                    _uow.BillItemRepo.Remove(billItem);
+                    if (bill.BillItems == null)
+                        bill.BillItems = new List<BillItem>();
+
+                    foreach (var newBillItem in request.BillItems)
+                    {
+                        bill.BillItems.Add(new BillItem
+                        {
+                            UserId = user.Id,
+                            CategoryId = newBillItem.CategoryId,
+                            Name = newBillItem.Name,
+                            TotalValue = newBillItem.TotalValue,
+                            User = user,
+                            Category = categories.First(c => c.Id == newBillItem.CategoryId)
+                        });
+                    }
+                }
+            }
+            else if (bill.BillItems != null && bill.BillItems.Any())
+            {
+                foreach (var billItemToDelete in bill.BillItems)
+                {
+                    bill.BillItems.Remove(billItemToDelete);
                 }
             }
 
-            _uow.BillRepo.Update(bill);
-            await _uow.CompleteAsync();
+            if (bill.BillItems != null && bill.BillItems.Any())
+                bill.TotalValue = bill.BillItems.Sum(b => b.TotalValue);
 
-            return (EditBillResult)bill.ToCreateBillResult();
+            try
+            {
+                _uow.BillRepo.Update(bill);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
+            return bill.ToCreateBillResult();
         }
 
         public async Task<DeleteBillResult> DeleteBill(string billGuidAsString)
@@ -156,8 +254,15 @@ namespace API.Services
             if (bill == null)
                 throw new OperationException(StatusCodes.Status500InternalServerError, "Internal server error. There is no Bill like this");
 
-            _uow.BillRepo.Remove(bill);
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.BillRepo.Remove(bill);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new DeleteBillResult("Bill has been deleted successfully!");
         }
@@ -165,9 +270,9 @@ namespace API.Services
 
     public static class BillServiceExtensions
     {
-        public static CreateBillRequest ToCreateBillResult(this Bill bill)
+        public static CreateBillResult ToCreateBillResult(this Bill bill)
         {
-            return new CreateBillRequest
+            return new CreateBillResult
             {
                 BillGuid = bill.BillGuid.ToString(),
                 UserGuid = bill.User.UserGuid.ToString(),
@@ -177,11 +282,13 @@ namespace API.Services
                 CreatedDate = bill.CreatedDate,
                 AccountBillNumber = bill.AccountBillNumber,
                 BillItems = bill.BillItems.Select(
-                    b => new CreateBillItemRequest
+                    b => new CreateBillItemResult
                     {
                         BillItemGuid = b.BillItemGuid.ToString(),
                         Name = b.Name,
                         TotalValue = b.TotalValue,
+                        CategoryId = b.CategoryId,
+                        UserGuid = b.User.UserGuid.ToString(),
                         BillItemCategory = new BillItemCategory
                         {
                             Id = b.CategoryId,
@@ -189,10 +296,10 @@ namespace API.Services
                         },
                         Author = new Author
                         {
-                            AuthorGuid = b.User.UserGuid.ToString(),
+                            UserGuid = b.User.UserGuid.ToString(),
                             Name = b.User.Login
                         }
-                    })
+                    }).ToList()
             };
         }
     }

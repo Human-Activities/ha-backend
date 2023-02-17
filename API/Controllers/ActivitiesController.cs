@@ -1,6 +1,8 @@
 ﻿using API.Models.Activities;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace API.Controllers
 {
@@ -16,6 +18,7 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(CreateActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateActivity(CreateActivityRequest request)
         {
@@ -25,6 +28,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get/{activityGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActvity(string activityGuid)
         {
@@ -33,16 +37,18 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("get")]
+        [HttpGet("get/{userGuid}.{groupGuid?}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<GetActivityResult>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetActvities(GetActivitiesRequest request)
+        public async Task<IActionResult> GetActvities(string userGuid, string? groupGuid = null)
         {
-            var result = await _activityService.GetActivities(request);
+            var result = await _activityService.GetActivities(userGuid, groupGuid);
 
             return Ok(result);
         }
 
         [HttpPut("edit")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(EditActivityResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditActivity(EditActivityRequest request)
         {
@@ -52,6 +58,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{activityGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteActivity(string activityGuid)
         {

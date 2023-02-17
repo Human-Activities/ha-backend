@@ -2,7 +2,7 @@
 
 namespace API.Models.Groups
 {
-    public class CreateGroupResult : CreateActivityResult
+    public class CreateGroupResult
     {
         public CreateGroupResult(string message)
         {

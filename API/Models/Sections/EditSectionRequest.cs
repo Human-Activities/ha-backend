@@ -4,10 +4,10 @@ namespace API.Models.Sections
 {
     public class EditSectionRequest
     {
-        public string SectionGuid { get; set; }
+        public string? SectionGuid { get; set; }
 
         public string Name { get; set; }
 
-        public IEnumerable<EditTaskRequest>? Tasks { get; set; }
+        public ICollection<GetTaskResult>? Tasks { get; set; }
     }
 }

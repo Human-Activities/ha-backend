@@ -54,7 +54,7 @@ namespace API.Authenticators
 
         public async Task<RefreshResult> RefreshAccessToken(User user, string refreshToken, IUnitOfWork unitOfWork)
         {
-            UserRole userRole = await unitOfWork.UserRoleRepo.SingleOrDefaultAsync(role => role.Id == user.RoleId);
+            var userRole = await unitOfWork.UserRoleRepo.SingleOrDefaultAsync(role => role.Id == user.RoleId);
             string accessToken = _accessTokenGenerator.GenerateToken(user, userRole);
 
             return new RefreshResult

@@ -7,6 +7,7 @@ using Services;
 using Services.PasswordHasher;
 using API.Exceptions;
 using API.Models.Authentication;
+using DAL.CommonVariables;
 
 namespace API.Services
 {
@@ -61,7 +62,7 @@ namespace API.Services
                 DateOfBirth = request.DateOfBirth,
                 Login = request.Login,
                 PasswordHash = passwordHash,
-                RoleId = 2
+                RoleId = 2 //(int)RoleType.LoggedUser
             };
 
             try
@@ -70,7 +71,9 @@ namespace API.Services
                 await _uow.CompleteAsync();
             }
             catch (Exception ex)
-            { }
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             var createdUser = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == request.Login);
 
@@ -81,8 +84,15 @@ namespace API.Services
                 Salt = salt
             };
 
-            await _uow.UserIdentityRepo.AddAsync(createdUserIdentity);
-            await _uow.CompleteAsync();
+            try
+            {
+                await _uow.UserIdentityRepo.AddAsync(createdUserIdentity);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new RegisterResult { IsSuccess = true, Message = "Poprawnie utworzono użytkownika." };
         }
@@ -108,41 +118,37 @@ namespace API.Services
             return await _authenticator.Authenticate(user, _uow);
         }
 
-        public async Task<RefreshResult> Refresh(RefreshRequest request, int userId)
+        public async Task<RefreshResult> Refresh(RefreshRequest request)
         {
             if (request == null)
                 throw new OperationException(StatusCodes.Status400BadRequest, "Invalid client request.");
 
-            bool isValidAccessToken = _accessTokenValidator.Validate(request.AccessToken);
-
-            if (!isValidAccessToken)
-                throw new OperationException(StatusCodes.Status400BadRequest, "Invalid access token.");
-
-            UserRefreshToken? userRefreshToken = await _uow.UserRefreshTokenRepo.FindAsync(userId);
-
-            if (userRefreshToken == null)
-                throw new OperationException(StatusCodes.Status400BadRequest, "Invalid refresh token.");
-
-            bool isValidRefreshToken = _refreshTokenValidator.Validate(userRefreshToken.Token);
+            bool isValidRefreshToken = _refreshTokenValidator.Validate(request.RefreshToken);
 
             if (!isValidRefreshToken)
                 throw new OperationException(StatusCodes.Status400BadRequest, "Invalid refresh token.");
 
-            var user = await _uow.UserRepo.FindAsync(userId);
+            var userRefreshToken = await _uow.UserRefreshTokenRepo.SingleOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
-            if (user == null)
-                throw new OperationException(StatusCodes.Status500InternalServerError, "User not found.");
+            if (userRefreshToken == null)
+                throw new OperationException(StatusCodes.Status500InternalServerError, "UserRefreshToken not found.");
 
-            return await _authenticator.RefreshAccessToken(user, userRefreshToken.Token, _uow);
+            return await _authenticator.RefreshAccessToken(userRefreshToken.User, request.RefreshToken, _uow);
         }
 
         public async Task<LogoutResult> Logout(int userId)
         {
             var userRefreshToken = await _uow.UserRefreshTokenRepo.FindAsync(userId);
 
-            _uow.UserRefreshTokenRepo.Remove(userRefreshToken);
-
-            await _uow.CompleteAsync();
+            try
+            {
+                _uow.UserRefreshTokenRepo.Remove(userRefreshToken);
+                await _uow.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OperationException(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
             return new LogoutResult("User has been logged out successfully.");
         }

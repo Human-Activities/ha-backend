@@ -1,5 +1,6 @@
 ﻿using API.Models.ToDoLists;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -17,7 +18,8 @@ namespace API.Controllers
         }
 
         [HttpPost("create")]
-        [ProducesResponseType(typeof(CreateToDoListResult), StatusCodes.Status200OK)]
+        [Authorize(Roles = "loggedUser")]
+        [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateToDoList(CreateToDoListRequest request)
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
@@ -27,6 +29,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get/{toDoListGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetToDoList(string toDoListGuid)
         {
@@ -36,8 +39,9 @@ namespace API.Controllers
         }
 
         [HttpGet("get-all/{groupGuid?}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetToDoLists(string? groupGuid = null) // jesli ToDoListId null to wez po userid
+        public async Task<IActionResult> GetToDoLists(string? groupGuid = null)
         {
             int userId = int.Parse(HttpContext.User.FindFirstValue("id"));
             var result = await _toDoListService.GetToDoLists(userId, groupGuid);
@@ -46,6 +50,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-templates/{groupGuid?}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(IEnumerable<GetToDoListResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetToDoListTemplates(string? groupGuid = null)
         {
@@ -56,7 +61,8 @@ namespace API.Controllers
         }
 
         [HttpPut("edit")]
-        [ProducesResponseType(typeof(EditToDoListResult), StatusCodes.Status200OK)]
+        [Authorize(Roles = "loggedUser")]
+        [ProducesResponseType(typeof(GetToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> EditToDoList(EditToDoListRequest request)
         {
             var result = await _toDoListService.EditToDoList(request);
@@ -65,6 +71,7 @@ namespace API.Controllers
         }
 
         [HttpPut("set-favourite")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(SetFavouriteResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> SetFavourite(SetFavouriteRequest request)
         {
@@ -74,6 +81,7 @@ namespace API.Controllers
         }
 
         [HttpPut("set-template")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(SetTemplateResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> SetTemplate(SetTemplateRequest request)
         {
@@ -83,6 +91,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete/{toDoListGuid}")]
+        [Authorize(Roles = "loggedUser")]
         [ProducesResponseType(typeof(DeleteToDoListResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteToDoList(string toDoListGuid)
         {

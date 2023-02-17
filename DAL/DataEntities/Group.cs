@@ -18,6 +18,8 @@
 
         public string? Description { get; set; }
 
+        public string? Link { get; set; }
+
 
         public virtual ICollection<Activity> Activities { get; set; }
 
