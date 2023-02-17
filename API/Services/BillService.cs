@@ -141,10 +141,14 @@ namespace API.Services
             if (user == null)
                 throw new OperationException(StatusCodes.Status400BadRequest, "User with this guid does not exist");
 
+            var categories = await _uow.CategoryRepo.GetAllAsync();
+
             if (request.BillItems != null)
             {
                 if (bill.BillItems != null && bill.BillItems.Any())
                 {
+                    var billItemsToDelete = new List<BillItem>();
+
                     foreach (var billItem in bill.BillItems)
                     {
                         var updatedBillItem = request.BillItems.SingleOrDefault(bi => bi.BillItemGuid == billItem.BillItemGuid.ToString());
@@ -158,7 +162,16 @@ namespace API.Services
                         }
                         else
                         {
-                            bill.BillItems.Remove(billItem);
+                            billItemsToDelete.Add(billItem);
+                            //bill.BillItems.Remove(billItem);
+                        }
+                    }
+
+                    if (billItemsToDelete.Any())
+                    {
+                        foreach (var billItemToDelete in billItemsToDelete)
+                        {
+                            bill.BillItems.Remove(billItemToDelete);
                         }
                     }
 
@@ -166,6 +179,7 @@ namespace API.Services
                     {
                         if (bill.BillItems == null)
                             bill.BillItems = new List<BillItem>();
+
 
                         foreach (var newBillItem in request.BillItems)
                         {
@@ -175,6 +189,8 @@ namespace API.Services
                                 CategoryId = newBillItem.CategoryId,
                                 Name = newBillItem.Name,
                                 TotalValue = newBillItem.TotalValue,
+                                User = user,
+                                Category = categories.First(c => c.Id == newBillItem.CategoryId)
                             });
                         }
                     }
@@ -192,6 +208,8 @@ namespace API.Services
                             CategoryId = newBillItem.CategoryId,
                             Name = newBillItem.Name,
                             TotalValue = newBillItem.TotalValue,
+                            User = user,
+                            Category = categories.First(c => c.Id == newBillItem.CategoryId)
                         });
                     }
                 }
