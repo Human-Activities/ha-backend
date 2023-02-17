@@ -174,7 +174,7 @@ public static class ActivityServiceExtensions
             },
             Author = new Author
             {
-                AuthorGuid = activity.User.UserGuid.ToString(),
+                UserGuid = activity.User.UserGuid.ToString(),
                 Name = activity.User.Login
             }
         };

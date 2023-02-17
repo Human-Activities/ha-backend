@@ -278,7 +278,7 @@ namespace API.Services
                         },
                         Author = new Author
                         {
-                            AuthorGuid = b.User.UserGuid.ToString(),
+                            UserGuid = b.User.UserGuid.ToString(),
                             Name = b.User.Login
                         }
                     }).ToList()
