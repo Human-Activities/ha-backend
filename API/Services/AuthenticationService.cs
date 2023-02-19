@@ -183,6 +183,7 @@ namespace API.Services
                 };
 
                 await _uow.UserRepo.AddAsync(user);
+                await _uow.CompleteAsync();
             }
 
             return user;
