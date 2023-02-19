@@ -168,16 +168,15 @@ namespace API.Services
         {
             var mail = new MailAddress(payload.Email);
 
-            var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == mail.Host);
+            var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == mail.User);
             if (user == null)
             {
-                // maybe try to add OauthSybject and OauthIssuer to database
                 user = new User()
                 {
                     Name = payload.Name,
                     LastName = payload.FamilyName,
                     DateOfBirth = DateTime.UtcNow,
-                    Login = mail.Host,
+                    Login = mail.User,
                     PasswordHash = string.Empty,
                     RoleId = 2 //(int)RoleType.LoggedUser
                 };
