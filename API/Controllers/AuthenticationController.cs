@@ -2,6 +2,11 @@
 using System.Security.Claims;
 using API.Services;
 using API.Models.Authentication;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -50,5 +55,21 @@ namespace API.Controllers
             var result = await _authenticationService.Logout(userId);
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        [HttpPost("google")]
+        [ProducesResponseType(typeof(LoginResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Google(UserView userView)
+        {
+            var payload = GoogleJsonWebSignature.ValidateAsync(userView.TokenId, new GoogleJsonWebSignature.ValidationSettings()).Result;
+            var result = await _authenticationService.Authenticate(payload);
+
+            return Ok(result);
+        }
+    }
+
+    public class UserView
+    {
+        public string TokenId { get; set; }
     }
 }

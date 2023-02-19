@@ -42,6 +42,11 @@ builder.Services.AddAuthentication(options =>
             ClockSkew = TimeSpan.Zero
         };
     });
+    //.AddGoogle(googleOptions =>
+    //{
+    //    googleOptions.ClientId = "1033380628767-gvmisaqq2gugi5seg21grb26id5kb894.apps.googleusercontent.com";//builder.Configuration["Authentication:Google:ClientId"]; // to mozna przeniesc do configa, ale poki co damy statycznie
+    //    googleOptions.ClientSecret = "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"; //builder.Configuration["Authentication:Google:ClientSecret"]; // to mozna przeniesc do configa, ale poki co damy statycznie
+    //});
 
 builder.Services.AddDomainServices();
 

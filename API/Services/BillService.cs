@@ -158,7 +158,7 @@ namespace API.Services
                             billItem.Name = updatedBillItem.Name;
                             billItem.TotalValue = updatedBillItem.TotalValue;
 
-                            request.BillItems.Remove(updatedBillItem);
+                            request.BillItems.ToList().Remove(updatedBillItem);
                         }
                         else
                         {

@@ -8,6 +8,8 @@ using Services.PasswordHasher;
 using API.Exceptions;
 using API.Models.Authentication;
 using DAL.CommonVariables;
+using System.Net.Mail;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Services
 {
@@ -151,6 +153,39 @@ namespace API.Services
             }
 
             return new LogoutResult("User has been logged out successfully.");
+        }
+
+        public async Task<LoginResult> Authenticate(Google.Apis.Auth.GoogleJsonWebSignature.Payload payload)
+        {
+            await System.Threading.Tasks.Task.Delay(1);
+
+            var user = await FindUserOrAdd(payload);
+
+            return await _authenticator.Authenticate(user, _uow);
+        }
+
+        private async Task<User> FindUserOrAdd(Google.Apis.Auth.GoogleJsonWebSignature.Payload payload)
+        {
+            var mail = new MailAddress(payload.Email);
+
+            var user = await _uow.UserRepo.SingleOrDefaultAsync(u => u.Login == mail.Host);
+            if (user == null)
+            {
+                // maybe try to add OauthSybject and OauthIssuer to database
+                user = new User()
+                {
+                    Name = payload.Name,
+                    LastName = payload.FamilyName,
+                    DateOfBirth = DateTime.UtcNow,
+                    Login = mail.Host,
+                    PasswordHash = string.Empty,
+                    RoleId = 2 //(int)RoleType.LoggedUser
+                };
+
+                await _uow.UserRepo.AddAsync(user);
+            }
+
+            return user;
         }
     }
 }
