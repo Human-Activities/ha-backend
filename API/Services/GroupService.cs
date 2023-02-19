@@ -150,7 +150,7 @@ public static class GroupsServiceExtensions
                         Login = u.User.Login,
                         Name = u.User.Name,
                         LastName = u.User.LastName,
-                        UserGuid = u.User.UserGuid
+                        UserGuid = u.User.UserGuid.ToString()
                     })
         };
     }
